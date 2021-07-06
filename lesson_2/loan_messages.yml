@@ -1,0 +1,7 @@
+welcome: "Welcome to the loan calculator!"
+loan_amount?: "How much is your loan? (Enter without $ sign or ,)"
+invalid_loan_amount: "Invalid loan amount (do not include '$' or ',')"
+apr?: "What is your APR? (Enter 5% as 5)"
+invalid_apr: "Invalid APR (Do not include '%')"
+loan_duration?: "What is the duration of the loan in years?"
+invalid_loan_duration: "Invalid loan duration"
