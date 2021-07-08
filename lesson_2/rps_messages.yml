@@ -1,6 +1,6 @@
 welcome: "=>Choose one: %{options} (r, p, s, l, sp)"
 win: "You won!"
-lose: "Computer won!"
+lose: "You lost!"
 tie: "It's a tie!"
 invalid_choice: "That's not a valid choice."
 ask_play_again: "Do you want to play again?"

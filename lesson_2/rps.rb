@@ -10,8 +10,6 @@ VALID_CHOICES = {
   l: 'lizard',
   sp: 'spock'
 }
-player_score = 0
-computer_score = 0
 
 def prompt(message)
   puts "=> #{MESSAGE[message]}"
@@ -54,10 +52,8 @@ end
 def display_result(player, computer)
   if who_wins?(player, computer)
     prompt('win')
-    player_scores
   elsif who_wins?(computer, player)
     prompt('lose')
-    computer_scores
   else
     prompt('tie')
   end
@@ -69,15 +65,33 @@ def play_again?
   answer.downcase.start_with?('y')
 end
 
-loop do
-  loop do
-      user_choice = get_choice
-      comp_choice = VALID_CHOICES.values.sample
-      puts "You chose #{user_choice}: Computer chose #{comp_choice}"
-      
-      display_result(user_choice, comp_choice)    
-  end
+def game
+  p1_score = 0
+  p2_score = 0
 
+  loop do
+    user_choice = get_choice
+    comp_choice = VALID_CHOICES.values.sample
+    puts "You chose #{user_choice}: Computer chose #{comp_choice}"
+    
+    display_result(user_choice, comp_choice)
+    
+    if who_wins?(user_choice, comp_choice)
+      p1_score += 1
+    elsif who_wins?(comp_choice, user_choice)
+      p2_score += 1
+    else
+    end 
+    
+    puts "Your score: #{p1_score}"
+    puts "Computer score: #{p2_score}"
+    break if p1_score == 3 || p2_score == 3
+  end
+end
+
+loop do
+  game
   break unless play_again?
 end
+
 prompt('goodbye')
