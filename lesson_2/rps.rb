@@ -1,5 +1,4 @@
 # change name when you finalize!
-require 'pry'
 require 'yaml'
 MESSAGE = YAML.load_file('rps_messages.yml')
 
@@ -15,24 +14,33 @@ def prompt(message)
   puts "=> #{MESSAGE[message]}"
 end
 
-def valid_choice?(choice)
-  VALID_CHOICES.has_key?(choice.to_sym) ||
-    VALID_CHOICES.has_value?(choice)
+def display_welcome(iteration)
+  if iteration == 0
+    puts format(MESSAGE['welcome'], options: VALID_CHOICES.values.join(', '))
+  end
+
+  puts format(MESSAGE['game_prompt'], options: VALID_CHOICES.values.join(', '))
 end
 
-def get_choice
+def valid_choice?(choice)
+  VALID_CHOICES.key?(choice.to_sym) ||
+    VALID_CHOICES.value?(choice)
+end
+
+def get_choice(iteration)
   choice = ''
   loop do
-    puts format(MESSAGE['welcome'], options: VALID_CHOICES.values.join(', '))
+    display_welcome(iteration)
+
     choice = gets.chomp.downcase
 
     break if valid_choice?(choice)
     prompt('invalid_choice')
   end
   if choice.length <= 2
-    return VALID_CHOICES[choice.to_sym]
+    VALID_CHOICES[choice.to_sym]
   else
-    return choice
+    choice
   end
 end
 
@@ -49,13 +57,31 @@ def who_wins?(player1, player2)
     (player1 == 'spock' && player2 == 'rock')
 end
 
-def display_result(player, computer)
+def display_game_result(player, computer)
   if who_wins?(player, computer)
     prompt('win')
   elsif who_wins?(computer, player)
     prompt('lose')
   else
     prompt('tie')
+  end
+  reset_display
+end
+
+def reset_display
+  sleep 1.75
+  system "clear"
+end
+
+def update_score(p1, p2)
+  who_wins?(p1, p2) ? 1 : 0
+end
+
+def display_final_result(p1_final, p2_final)
+  if p1_final > p2_final
+    prompt('final_winner')
+  else
+    prompt('final_loser')
   end
 end
 
@@ -65,32 +91,29 @@ def play_again?
   answer.downcase.start_with?('y')
 end
 
-def game
+loop do
   p1_score = 0
   p2_score = 0
+  game_iteration = 0
 
   loop do
-    user_choice = get_choice
+    user_choice = get_choice(game_iteration)
     comp_choice = VALID_CHOICES.values.sample
+
     puts "You chose #{user_choice}: Computer chose #{comp_choice}"
-    
-    display_result(user_choice, comp_choice)
-    
-    if who_wins?(user_choice, comp_choice)
-      p1_score += 1
-    elsif who_wins?(comp_choice, user_choice)
-      p2_score += 1
-    else
-    end 
-    
+    display_game_result(user_choice, comp_choice)
+
+    p1_score += update_score(user_choice, comp_choice)
+    p2_score += update_score(comp_choice, user_choice)
+    game_iteration += 1
+
     puts "Your score: #{p1_score}"
     puts "Computer score: #{p2_score}"
-    break if p1_score == 3 || p2_score == 3
+    if p1_score == 3 || p2_score == 3
+      display_final_result(p1_score, p2_score)
+      break
+    end
   end
-end
-
-loop do
-  game
   break unless play_again?
 end
 
