@@ -10,6 +10,14 @@ VALID_CHOICES = {
   sp: 'spock'
 }
 
+WIN_OPTIONS = {
+  r: ['l', 's'], 
+  p: ['r', 'sp'],
+  s: ['l', 'p'],
+  l: ['p', 'sp'],
+  sp: ['r', 's']
+}
+
 def prompt(message)
   puts "=> #{MESSAGE[message]}"
 end
