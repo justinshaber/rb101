@@ -12,7 +12,7 @@ VALID_CHOICES = {
 }
 
 WIN_OPTIONS = {
-  rock: ['lizard', 'scissors'], 
+  rock: ['lizard', 'scissors'],
   paper: ['rock', 'spock'],
   scissors: ['lizard', 'paper'],
   lizard: ['paper', 'spock'],
@@ -88,6 +88,10 @@ def display_final_result(p1_final, p2_final)
   end
 end
 
+def reset_scoreboard(scores_hash1)
+  scores_hash1.transform_values! { |_| 0 }
+end
+
 def play_again?
   prompt('ask_play_again')
   answer = gets.chomp
@@ -100,6 +104,7 @@ loop do
     comp_choice = VALID_CHOICES.values.sample
 
     puts "You chose #{user_choice}: Computer chose #{comp_choice}"
+
     display_game_result(user_choice, comp_choice)
 
     scores[:user] += update_score(user_choice, comp_choice)
@@ -110,7 +115,7 @@ loop do
 
     if scores[:user] == 3 || scores[:comp] == 3
       display_final_result(scores[:user], scores[:comp])
-      scores.transform_values! {|value| value = 0 }
+      reset_scoreboard(scores)
       break
     end
   end
