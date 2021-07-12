@@ -1,5 +1,3 @@
-# change name when you finalize!
-require 'pry'
 require 'yaml'
 MESSAGE = YAML.load_file('rps_messages.yml')
 
@@ -109,7 +107,7 @@ loop do
 
     scores[:user] += update_score(user_choice, comp_choice)
     scores[:comp] += update_score(comp_choice, user_choice)
-    scores[:game] = 1
+    scores[:game] = 1 # prevents full welcome message from showing up each time
 
     display_scoreboard(scores)
 
