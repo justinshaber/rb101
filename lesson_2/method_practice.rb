@@ -30,3 +30,4 @@ end
 #p scores
 update_score
 p scores
+puts "Hello World"
