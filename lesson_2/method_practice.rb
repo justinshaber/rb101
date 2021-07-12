@@ -23,11 +23,10 @@ VALID_CHOICES = {
 
 scores = { user: 0, comp: 0, game: 0 }
 
-def update_score(scores)
-  p scores
+def update_score(hash)
+  puts hash[:user]
 end
 
 #p scores
-update_score
+update_score(scores)
 p scores
-puts "Hello World"

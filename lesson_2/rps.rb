@@ -66,6 +66,11 @@ def display_game_result(player, computer)
   reset_display
 end
 
+def display_scoreboard(scores_hash)
+  puts "Your score: #{scores_hash[:user]}"
+  puts "Computer score: #{scores_hash[:comp]}"
+end
+
 def reset_display
   sleep 1.75
   system "clear"
@@ -101,8 +106,8 @@ loop do
     scores[:comp] += update_score(comp_choice, user_choice)
     scores[:game] = 1
 
-    puts "Your score: #{scores[:user]}"
-    puts "Computer score: #{scores[:comp]}"
+    display_scoreboard(scores)
+
     if scores[:user] == 3 || scores[:comp] == 3
       display_final_result(scores[:user], scores[:comp])
       scores.transform_values! {|value| value = 0 }
