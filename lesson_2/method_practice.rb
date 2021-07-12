@@ -13,4 +13,20 @@ WIN_OPTIONS = {
   sp: ['r', 's']
 }
 
-puts WIN_OPTIONS[:r].include?('sp')
+VALID_CHOICES = {
+  r: 'rock',
+  p: 'paper',
+  s: 'scissors',
+  l: 'lizard',
+  sp: 'spock'
+}
+
+scores = { user: 0, comp: 0, game: 0 }
+
+def update_score(scores)
+  p scores
+end
+
+#p scores
+update_score
+p scores

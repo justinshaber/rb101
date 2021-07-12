@@ -1,4 +1,5 @@
 # change name when you finalize!
+require 'pry'
 require 'yaml'
 MESSAGE = YAML.load_file('rps_messages.yml')
 
@@ -11,12 +12,14 @@ VALID_CHOICES = {
 }
 
 WIN_OPTIONS = {
-  r: ['l', 's'], 
-  p: ['r', 'sp'],
-  s: ['l', 'p'],
-  l: ['p', 'sp'],
-  sp: ['r', 's']
+  rock: ['lizard', 'scissors'], 
+  paper: ['rock', 'spock'],
+  scissors: ['lizard', 'paper'],
+  lizard: ['paper', 'spock'],
+  spock: ['rock', 'scissors']
 }
+
+scores = { user: 0, comp: 0, game: 0 }
 
 def prompt(message)
   puts "=> #{MESSAGE[message]}"
@@ -52,23 +55,10 @@ def get_choice(iteration)
   end
 end
 
-def who_wins?(player1, player2)
-  (player1 == 'rock' && player2 == 'scissors') ||
-    (player1 == 'paper' && player2 == 'rock') ||
-    (player1 == 'scissors' && player2 == 'paper') ||
-    (player1 == 'rock' && player2 == 'lizard') ||
-    (player1 == 'lizard' && player2 == 'spock') ||
-    (player1 == 'spock' && player2 == 'scissors') ||
-    (player1 == 'scissors' && player2 == 'lizard') ||
-    (player1 == 'lizard' && player2 == 'paper') ||
-    (player1 == 'paper' && player2 == 'spock') ||
-    (player1 == 'spock' && player2 == 'rock')
-end
-
 def display_game_result(player, computer)
-  if who_wins?(player, computer)
+  if WIN_OPTIONS[player.to_sym].include?(computer)
     prompt('win')
-  elsif who_wins?(computer, player)
+  elsif WIN_OPTIONS[computer.to_sym].include?(player)
     prompt('lose')
   else
     prompt('tie')
@@ -82,7 +72,7 @@ def reset_display
 end
 
 def update_score(p1, p2)
-  who_wins?(p1, p2) ? 1 : 0
+  WIN_OPTIONS[p1.to_sym].include?(p2) ? 1 : 0
 end
 
 def display_final_result(p1_final, p2_final)
@@ -100,25 +90,22 @@ def play_again?
 end
 
 loop do
-  p1_score = 0
-  p2_score = 0
-  game_iteration = 0
-
   loop do
-    user_choice = get_choice(game_iteration)
+    user_choice = get_choice(scores[:game])
     comp_choice = VALID_CHOICES.values.sample
 
     puts "You chose #{user_choice}: Computer chose #{comp_choice}"
     display_game_result(user_choice, comp_choice)
 
-    p1_score += update_score(user_choice, comp_choice)
-    p2_score += update_score(comp_choice, user_choice)
-    game_iteration += 1
+    scores[:user] += update_score(user_choice, comp_choice)
+    scores[:comp] += update_score(comp_choice, user_choice)
+    scores[:game] = 1
 
-    puts "Your score: #{p1_score}"
-    puts "Computer score: #{p2_score}"
-    if p1_score == 3 || p2_score == 3
-      display_final_result(p1_score, p2_score)
+    puts "Your score: #{scores[:user]}"
+    puts "Computer score: #{scores[:comp]}"
+    if scores[:user] == 3 || scores[:comp] == 3
+      display_final_result(scores[:user], scores[:comp])
+      scores.transform_values! {|value| value = 0 }
       break
     end
   end
