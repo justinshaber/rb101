@@ -7,14 +7,17 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]] # diagonals
 
+score = { Player: 0, Computer: 0, game: 0 }
+
 def prompt(str)
   puts "=> #{str}"
 end
 
 # rubocop:disable Metrics/AbcSize
-def display_board(brd)
+def display_board(brd, score)
   system 'clear'
-  puts "You're #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
+  puts " You're #{PLAYER_MARKER} | Computer is #{COMPUTER_MARKER}."
+  puts "Player: #{score[:Player]} | Computer: #{score[:Computer]}"
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -74,10 +77,10 @@ def board_full?(brd)
 end
 
 def someone_won?(brd)
-  !!detect_winner(brd)
+  !!detect_game_winner(brd)
 end
 
-def detect_winner(brd)
+def detect_game_winner(brd)
   WINNING_LINES.each do |line|
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
       return 'Player'
@@ -88,12 +91,16 @@ def detect_winner(brd)
   nil
 end
 
+def detect_match_winner(score)
+  score[:Player] == 3 ? 'Player' : 'Computer'
+end
+
 loop do
   board = initialize_board
-  display_board(board)
+  # display_board(board, score)
 
   loop do
-    display_board(board)
+    display_board(board, score)
 
     player_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
@@ -102,17 +109,21 @@ loop do
     break if someone_won?(board) || board_full?(board)
   end
 
-  display_board(board)
-
   if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
+    score[detect_game_winner(board).to_sym] += 1
+    display_board(board, score)
+    prompt "#{detect_game_winner(board)} won the game!"
   else
+    display_board(board, score)
     prompt "It's a tie"
   end
 
-  prompt "Play again? (y or n)"
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  if score[:Player] == 3 || score[:Computer] == 3
+    prompt "#{detect_match_winner(score)} won the match!"
+    prompt "Play again? (y or n)"
+    answer = gets.chomp
+    break unless answer.downcase.start_with?('y')
+  end
 end
 
 prompt "Thanks for playing Tic Tac Toe! Goodbye."
