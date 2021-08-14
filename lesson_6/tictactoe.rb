@@ -1,7 +1,5 @@
 require 'pry'
 
-# practicing branching
-
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
