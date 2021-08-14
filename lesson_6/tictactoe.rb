@@ -37,6 +37,18 @@ def initialize_board
   new_board
 end
 
+def joinor(arr, delimiter = ", ", and_or = "or")
+  case arr.size
+  when 0 then ''
+  when 1 then arr.join
+  when 2 then arr.join(" #{and_or} ")
+  else
+    str = arr.join(delimiter)
+    str[-2] = " #{and_or} "
+    str
+  end
+end
+
 def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
@@ -44,7 +56,7 @@ end
 def player_places_piece!(brd)
   square = ''
   loop do
-    prompt "Choose a square #{empty_squares(brd)}"
+    prompt "Choose a square #{joinor(empty_squares(brd))}"
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     prompt "Invalid choice"
