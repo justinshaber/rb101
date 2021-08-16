@@ -1,4 +1,4 @@
-require 'pry'
+require 'pry-byebug'
 
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
@@ -56,6 +56,17 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+def find_at_risk_square(line, brd)
+  if brd.values_at(*line).count(PLAYER_MARKER) == 2 &&
+     brd.values_at(*line).count(INITIAL_MARKER) == 1
+     
+    block_position = brd.values_at(*line).index(' ')
+    return line[block_position]
+  else
+    nil
+  end
+end
+
 def player_places_piece!(brd)
   square = ''
   loop do
@@ -68,7 +79,16 @@ def player_places_piece!(brd)
 end
 
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  square = nil
+  WINNING_LINES.each do |line|
+    square = find_at_risk_square(line, brd)
+    break if square
+  end
+
+  if !square 
+    square = empty_squares(brd).sample
+  end
+
   brd[square] = COMPUTER_MARKER
 end
 
@@ -123,6 +143,7 @@ loop do
     prompt "Play again? (y or n)"
     answer = gets.chomp
     break unless answer.downcase.start_with?('y')
+    score.each {|key, _| score[key] = 0} 
   end
 end
 
