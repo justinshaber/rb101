@@ -9,6 +9,7 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
 
 score = { Player: 0, Computer: 0, Game: 0 }
 first_to_go = ''
+current_player = ''
 
 def prompt(str)
   puts "=> #{str}"
@@ -53,6 +54,10 @@ def set_first_to_go
   first
 end
 
+def alternate_player(current)
+  current == 'Player' ? 'Computer' : 'Player'
+end
+
 def joinor(arr, delimiter = ", ", and_or = "or")
   case arr.size
   when 0 then ''
@@ -78,6 +83,10 @@ def find_at_risk_square(line, brd, marker)
   else
     nil
   end
+end
+
+def place_piece!(board, current)
+  current == 'Player' ? player_places_piece!(board) : computer_places_piece!(board)
 end
 
 def player_places_piece!(brd)
@@ -146,17 +155,12 @@ loop do
     first_to_go = set_first_to_go
   end
 
-  if first_to_go != 1
-    computer_places_piece!(board)
-  end
+  first_to_go == 1 ? current_player = 'Player' : current_player = 'Computer'
 
   loop do
     display_board(board, score)
-
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-
-    computer_places_piece!(board)
+    place_piece!(board, current_player)
+    current_player = alternate_player(current_player)
     break if someone_won?(board) || board_full?(board)
   end
 
