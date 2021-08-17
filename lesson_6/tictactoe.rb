@@ -160,6 +160,21 @@ def enter_to_continue
   STDIN.gets
 end
 
+def play_again?
+  loop do
+    prompt('ask_play_again')
+    answer = gets.chomp
+    if answer.downcase == 'y'
+      return true
+    end
+    if answer.downcase == 'n'
+      return false
+    end
+
+    prompt('invalid_choice', "[y] or [n]")
+  end
+end
+
 loop do
   board = initialize_board
   
@@ -192,9 +207,8 @@ loop do
 
   if score.values.include?(WINNING_SCORE)
     prompt('match_winner', detect_match_winner(score))
-    prompt('ask_play_again')
-    answer = gets.chomp
-    break unless answer.downcase.start_with?('y')
+
+    break unless play_again?
     score.each {|key, _| score[key] = 0}
     game = 0
   end
