@@ -1,4 +1,6 @@
 require 'pry-byebug'
+require 'yaml'
+MESSAGE = YAML.load_file('tictactoe_messages.yml')
 
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
@@ -6,20 +8,22 @@ COMPUTER_MARKER = 'O'
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]] # diagonals
+WINNING_SCORE = 3
 
-score = { Player: 0, Computer: 0, Game: 0 }
+score = { Player: 0, Computer: 0}
+game = 0
 first_to_go = ''
 current_player = ''
 
-def prompt(str)
-  puts "=> #{str}"
+def prompt(message, options = '')
+  puts format("=> #{MESSAGE[message]}", options: options)
 end
 
 # rubocop:disable Metrics/AbcSize
-def display_board(brd, score)
+def display_board(brd, score, game)
   system 'clear'
   puts " You're #{PLAYER_MARKER} | Computer is #{COMPUTER_MARKER}"
-  puts "Player: #{score[:Player]} | Computer: #{score[:Computer]} | Games: #{score[:Game]}"
+  puts "Player: #{score[:Player]} | Computer: #{score[:Computer]} | Games: #{game}"
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -45,11 +49,12 @@ end
 def set_first_to_go
   first = nil
   loop do
-    prompt ("Who should go first?\nPress '1' - You go first\nPress '2' - Computer goes first\nPress '3' - Computer chooses who goes first")
+    prompt ('go_first')
     first = gets.chomp.to_i
 
     break if (1..3).include?(first)
-    prompt "Invalid choice"
+    system 'clear'
+    prompt('invalid_choice', joinor([1,2,3]))
   end
   first
 end
@@ -92,10 +97,12 @@ end
 def player_places_piece!(brd)
   square = ''
   loop do
-    prompt "Choose a square #{joinor(empty_squares(brd))}"
+    prompt('choose_square', joinor(empty_squares(brd)))
+    # puts format(MESSAGE['choose_square'], options: joinor(empty_squares(brd)))
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
-    prompt "Invalid choice"
+    prompt('invalid_choice', joinor(empty_squares(brd)))
+    # puts format(MESSAGE['invalid_choice'], options: joinor(empty_squares(brd)))
   end
   brd[square] = PLAYER_MARKER
 end
@@ -145,43 +152,52 @@ def detect_game_winner(brd)
 end
 
 def detect_match_winner(score)
-  score[:Player] == 3 ? 'Player' : 'Computer'
+  score[:Player] == WINNING_SCORE ? 'Player' : 'Computer'
+end
+
+def enter_to_continue
+  prompt('press_enter')
+  STDIN.gets
 end
 
 loop do
   board = initialize_board
   
-  if score[:Game] == 0
+  if game == 0
+    prompt('welcome', WINNING_SCORE)
     first_to_go = set_first_to_go
   end
 
   first_to_go == 1 ? current_player = 'Player' : current_player = 'Computer'
 
   loop do
-    display_board(board, score)
+    display_board(board, score, game)
     place_piece!(board, current_player)
     current_player = alternate_player(current_player)
     break if someone_won?(board) || board_full?(board)
   end
 
-  score[:Game] += 1
+  game += 1
 
   if someone_won?(board)
     score[detect_game_winner(board).to_sym] += 1
-    display_board(board, score)
-    prompt "#{detect_game_winner(board)} won the game!"
+    display_board(board, score, game)
+    prompt('game_winner', detect_game_winner(board))
+    enter_to_continue unless score.values.include?(WINNING_SCORE)
   else
-    display_board(board, score)
-    prompt "It's a tie"
+    display_board(board, score, game)
+    prompt('tie')
+    enter_to_continue
   end
 
-  if score[:Player] == 3 || score[:Computer] == 3
-    prompt "#{detect_match_winner(score)} won the match!"
-    prompt "Play again? (y or n)"
+  if score.values.include?(WINNING_SCORE)
+    prompt('match_winner', detect_match_winner(score))
+    prompt('ask_play_again')
     answer = gets.chomp
     break unless answer.downcase.start_with?('y')
-    score.each {|key, _| score[key] = 0} 
+    score.each {|key, _| score[key] = 0}
+    game = 0
   end
 end
 
-prompt "Thanks for playing Tic Tac Toe! Goodbye."
+prompt('goodbye')
