@@ -1,4 +1,3 @@
-require 'pry-byebug'
 require 'yaml'
 MESSAGE = YAML.load_file('tictactoe_messages.yml')
 
@@ -56,7 +55,8 @@ def set_first_to_go
     system 'clear'
     prompt('invalid_choice', joinor([1,2,3]))
   end
-  first
+  
+  first == 1 ? 'Player' : 'Computer'
 end
 
 def alternate_player(current)
@@ -183,7 +183,7 @@ loop do
     first_to_go = set_first_to_go
   end
 
-  first_to_go == 1 ? current_player = 'Player' : current_player = 'Computer'
+  current_player = first_to_go
 
   loop do
     display_board(board, score, game)
@@ -193,17 +193,12 @@ loop do
   end
 
   game += 1
+  score[detect_game_winner(board).to_sym] += 1 if someone_won?(board)
 
-  if someone_won?(board)
-    score[detect_game_winner(board).to_sym] += 1
-    display_board(board, score, game)
-    prompt('game_winner', detect_game_winner(board))
-    enter_to_continue unless score.values.include?(WINNING_SCORE)
-  else
-    display_board(board, score, game)
-    prompt('tie')
-    enter_to_continue
-  end
+  display_board(board, score, game)
+
+  someone_won?(board) ? prompt('game_winner', detect_game_winner(board)) : prompt('tie')
+  enter_to_continue unless score.values.include?(WINNING_SCORE)
 
   if score.values.include?(WINNING_SCORE)
     prompt('match_winner', detect_match_winner(score))
