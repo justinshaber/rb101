@@ -7,7 +7,8 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]] # diagonals
 
-score = { Player: 0, Computer: 0, game: 0 }
+score = { Player: 0, Computer: 0, Game: 0 }
+first_to_go = ''
 
 def prompt(str)
   puts "=> #{str}"
@@ -16,8 +17,8 @@ end
 # rubocop:disable Metrics/AbcSize
 def display_board(brd, score)
   system 'clear'
-  puts " You're #{PLAYER_MARKER} | Computer is #{COMPUTER_MARKER}."
-  puts "Player: #{score[:Player]} | Computer: #{score[:Computer]}"
+  puts " You're #{PLAYER_MARKER} | Computer is #{COMPUTER_MARKER}"
+  puts "Player: #{score[:Player]} | Computer: #{score[:Computer]} | Games: #{score[:Game]}"
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -38,6 +39,18 @@ def initialize_board
   new_board = {}
   (1..9).each { |num| new_board[num] = INITIAL_MARKER }
   new_board
+end
+
+def set_first_to_go
+  first = nil
+  loop do
+    prompt ("Who should go first?\nPress '1' - You go first\nPress '2' - Computer goes first\nPress '3' - Computer chooses who goes first")
+    first = gets.chomp.to_i
+
+    break if (1..3).include?(first)
+    prompt "Invalid choice"
+  end
+  first
 end
 
 def joinor(arr, delimiter = ", ", and_or = "or")
@@ -128,7 +141,14 @@ end
 
 loop do
   board = initialize_board
-  # display_board(board, score)
+  
+  if score[:Game] == 0
+    first_to_go = set_first_to_go
+  end
+
+  if first_to_go != 1
+    computer_places_piece!(board)
+  end
 
   loop do
     display_board(board, score)
@@ -139,6 +159,8 @@ loop do
     computer_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
   end
+
+  score[:Game] += 1
 
   if someone_won?(board)
     score[detect_game_winner(board).to_sym] += 1
