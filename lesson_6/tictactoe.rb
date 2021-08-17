@@ -56,12 +56,12 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-def find_at_risk_square(line, brd)
-  if brd.values_at(*line).count(PLAYER_MARKER) == 2 &&
+def find_at_risk_square(line, brd, marker)
+  if brd.values_at(*line).count(marker) == 2 &&
      brd.values_at(*line).count(INITIAL_MARKER) == 1
-     
-    block_position = brd.values_at(*line).index(' ')
-    return line[block_position]
+
+     desired_position = brd.values_at(*line).index(' ')
+     return line[desired_position]
   else
     nil
   end
@@ -81,11 +81,22 @@ end
 def computer_places_piece!(brd)
   square = nil
   WINNING_LINES.each do |line|
-    square = find_at_risk_square(line, brd)
+    square = find_at_risk_square(line, brd, COMPUTER_MARKER)
     break if square
   end
 
-  if !square 
+  if !square
+    WINNING_LINES.each do |line|
+      square = find_at_risk_square(line, brd, PLAYER_MARKER)
+      break if square
+    end
+  end
+
+  if !square
+    square = 5 if empty_squares(brd).include?(5)
+  end
+
+  if !square
     square = empty_squares(brd).sample
   end
 
