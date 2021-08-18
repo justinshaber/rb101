@@ -9,7 +9,7 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 5, 9], [3, 5, 7]] # diagonals
 WINNING_SCORE = 3
 
-score = { Player: 0, Computer: 0}
+score = { Player: 0, Computer: 0 }
 game = 0
 first_to_go = ''
 current_player = ''
@@ -19,10 +19,9 @@ def prompt(message, options = '')
 end
 
 # rubocop:disable Metrics/AbcSize
-def display_board(brd, score, game)
+def display_board(brd, score)
   system 'clear'
-  puts " You're #{PLAYER_MARKER} | Computer is #{COMPUTER_MARKER}"
-  puts "Player: #{score[:Player]} | Computer: #{score[:Computer]} | Games: #{game}"
+  display_scoreboard(score)
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -39,6 +38,11 @@ def display_board(brd, score, game)
 end
 # rubocop:enable Metrics/AbcSize
 
+def display_scoreboard(score)
+  puts "You [#{PLAYER_MARKER}] | Computer [#{COMPUTER_MARKER}]"
+  puts "  #{score[:Player]}     |      #{score[:Computer]}"
+end
+
 def initialize_board
   new_board = {}
   (1..9).each { |num| new_board[num] = INITIAL_MARKER }
@@ -48,14 +52,14 @@ end
 def set_first_to_go
   first = nil
   loop do
-    prompt ('go_first')
+    prompt('go_first')
     first = gets.chomp.to_i
 
     break if (1..3).include?(first)
     system 'clear'
-    prompt('invalid_choice', joinor([1,2,3]))
+    prompt('invalid_choice', joinor([1, 2, 3]))
   end
-  
+
   first == 1 ? 'Player' : 'Computer'
 end
 
@@ -79,53 +83,54 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-def find_at_risk_square(line, brd, marker)
+def find_desired_square(line, brd, marker)
   if brd.values_at(*line).count(marker) == 2 &&
      brd.values_at(*line).count(INITIAL_MARKER) == 1
 
-     desired_position = brd.values_at(*line).index(' ')
-     return line[desired_position]
-  else
-    nil
+    desired_position = brd.values_at(*line).index(' ')
+    return line[desired_position]
   end
+  nil
 end
 
 def place_piece!(board, current)
-  current == 'Player' ? player_places_piece!(board) : computer_places_piece!(board)
+  current == 'Player' ? player_plays!(board) : computer_plays!(board)
 end
 
-def player_places_piece!(brd)
+def player_plays!(brd)
   square = ''
   loop do
     prompt('choose_square', joinor(empty_squares(brd)))
-    # puts format(MESSAGE['choose_square'], options: joinor(empty_squares(brd)))
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     prompt('invalid_choice', joinor(empty_squares(brd)))
-    # puts format(MESSAGE['invalid_choice'], options: joinor(empty_squares(brd)))
   end
   brd[square] = PLAYER_MARKER
 end
 
-def computer_places_piece!(brd)
+def play_third_square()
+
+end
+
+def computer_plays!(brd)
   square = nil
-  WINNING_LINES.each do |line|
-    square = find_at_risk_square(line, brd, COMPUTER_MARKER)
+  WINNING_LINES.each do |line| # Computer will win if it can
+    square = find_desired_square(line, brd, COMPUTER_MARKER)
     break if square
   end
 
-  if !square
+  if !square # Computer will block player from winning
     WINNING_LINES.each do |line|
-      square = find_at_risk_square(line, brd, PLAYER_MARKER)
+      square = find_desired_square(line, brd, PLAYER_MARKER)
       break if square
     end
   end
 
-  if !square
+  if !square # Computer will choose 5 if square is empty
     square = 5 if empty_squares(brd).include?(5)
   end
 
-  if !square
+  if !square # Computer will choose a random square
     square = empty_squares(brd).sample
   end
 
@@ -137,10 +142,10 @@ def board_full?(brd)
 end
 
 def someone_won?(brd)
-  !!detect_game_winner(brd)
+  !!game_winner(brd)
 end
 
-def detect_game_winner(brd)
+def game_winner(brd)
   WINNING_LINES.each do |line|
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
       return 'Player'
@@ -151,7 +156,7 @@ def detect_game_winner(brd)
   nil
 end
 
-def detect_match_winner(score)
+def match_winner(score)
   score[:Player] == WINNING_SCORE ? 'Player' : 'Computer'
 end
 
@@ -164,12 +169,9 @@ def play_again?
   loop do
     prompt('ask_play_again')
     answer = gets.chomp
-    if answer.downcase == 'y'
-      return true
-    end
-    if answer.downcase == 'n'
-      return false
-    end
+
+    return true if answer.downcase == 'y'
+    return false if answer.downcase == 'n'
 
     prompt('invalid_choice', "[y] or [n]")
   end
@@ -177,7 +179,7 @@ end
 
 loop do
   board = initialize_board
-  
+
   if game == 0
     prompt('welcome', WINNING_SCORE)
     first_to_go = set_first_to_go
@@ -186,25 +188,30 @@ loop do
   current_player = first_to_go
 
   loop do
-    display_board(board, score, game)
+    display_board(board, score)
     place_piece!(board, current_player)
     current_player = alternate_player(current_player)
     break if someone_won?(board) || board_full?(board)
   end
 
   game += 1
-  score[detect_game_winner(board).to_sym] += 1 if someone_won?(board)
+  score[game_winner(board).to_sym] += 1 if someone_won?(board)
 
-  display_board(board, score, game)
+  display_board(board, score)
 
-  someone_won?(board) ? prompt('game_winner', detect_game_winner(board)) : prompt('tie')
+  if someone_won?(board)
+    prompt('game_winner', game_winner(board))
+  else
+    prompt('tie')
+  end
+
   enter_to_continue unless score.values.include?(WINNING_SCORE)
 
   if score.values.include?(WINNING_SCORE)
-    prompt('match_winner', detect_match_winner(score))
+    prompt('match_winner', match_winner(score))
 
     break unless play_again?
-    score.each {|key, _| score[key] = 0}
+    score.each { |key, _| score[key] = 0 }
     game = 0
   end
 end
