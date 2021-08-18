@@ -108,29 +108,27 @@ def player_plays!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def play_third_square()
-
+def get_third_square(brd, marker)
+  square = nil
+  WINNING_LINES.each do |line|
+    square = find_desired_square(line, brd, marker)
+    break if square
+  end
+  square
 end
 
 def computer_plays!(brd)
-  square = nil
-  WINNING_LINES.each do |line| # Computer will win if it can
-    square = find_desired_square(line, brd, COMPUTER_MARKER)
-    break if square
+  square = get_third_square(brd, COMPUTER_MARKER)
+
+  if !square
+    square = get_third_square(brd, PLAYER_MARKER)
   end
 
-  if !square # Computer will block player from winning
-    WINNING_LINES.each do |line|
-      square = find_desired_square(line, brd, PLAYER_MARKER)
-      break if square
-    end
-  end
-
-  if !square # Computer will choose 5 if square is empty
+  if !square
     square = 5 if empty_squares(brd).include?(5)
   end
 
-  if !square # Computer will choose a random square
+  if !square
     square = empty_squares(brd).sample
   end
 
