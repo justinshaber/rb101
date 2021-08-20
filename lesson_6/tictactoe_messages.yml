@@ -4,7 +4,7 @@ go_first: "Who should go first?
 \n[2] - Computer goes first
 \n[3] - Computer chooses who goes first"
 invalid_choice: "Invalid choice. Please choose %{options}"
-choose_square: "Choose a square %{options}}"
+choose_square: "Choose a square %{options}"
 tie: "It's a tie"
 game_winner: "%{options} won the game!"
 match_winner: "%{options} won the match!"
