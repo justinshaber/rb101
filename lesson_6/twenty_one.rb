@@ -2,24 +2,29 @@ require 'yaml'
 MESSAGE = YAML.load_file('twenty_one_messages.yml')
 
 SUITS = %w(c d h s)
-CARDS = ("2".."10").to_a + %w(J Q K A)
-dealer = { cards: [], total: 0, ace_total: 0}
-player = { cards: [], total: 0, ace_total: 0}
-players_cards = []
+NUM_CARDS = ("2".."10").to_a
+FACE_CARDS = %w(J Q K)
+ACE = %w(A)
+ALL_CARDS = NUM_CARDS + FACE_CARDS + ACE
+LOW_ACE = 1
+HIGH_ACE = 11
+
+dealer = { cards: [], total: []}
+player = { cards: [], total: []}
 
 
 def display_hands(dealer_hash, player_hash)
   puts "     Dealer"
   puts "    | | |#{dealer_hash[:cards][1]}|"
   puts ""
-  puts "    |#{player_hash[:cards][0]}| |#{player_hash[:cards][1]}| ==> #{player_hash[:total]}"
+  puts "    |#{player_hash[:cards][0]}| |#{player_hash[:cards][1]}| ==> #{display_total(player_hash)}"
   puts "     Player"
 end
 
 def initialize_deck
   new_deck = []
   SUITS.each do |suit|
-    CARDS.each do |card|
+    ALL_CARDS.each do |card|
       new_deck << card + suit
     end
   end
@@ -38,31 +43,67 @@ def deal_cards(deck, dealer_hash, player_hash)
   end
 end
 
-def calculate_total(hash_info)
+def calculate_total(hash_info, ace = 0)
   value = []
   hash_info[:cards].each do |card|
-    if ("2".."10").to_a.include?(card[0])
+    if NUM_CARDS.include?(card[0])
       value << card[0].to_i
     elsif card[0] == 'A'
-      value << 11
+
+      value << ace
     else
       value << 10
     end
   end
-  value
   value.sum
 end
 
-def handling_aces
+def return_total(hash_info)
+  case number_of_aces?(hash_info)
+  when 0
+    return [calculate_total(hash_info)]
+  when 1
+    low_total = calculate_total(hash_info, LOW_ACE)
+    high_total = calculate_total(hash_info, HIGH_ACE)
+    return [low_total, high_total]
+  when 2
+    if # conditional
+      both_aces_low_total = calculate_total(hash_info, LOW_ACE)
+      
+      return [both_aces_low_total, one_ace_low_total]
+    else
+      low_total = calculate_total(hash_info, LOW_ACE)
+      return low_total
+    end
+  end
 
+  
+  # if low_total == high_total
+  #   return [low_total]
+  # else
+  #   return [low_total, high_total]
+  # end
+end
+
+def display_total(hash_info)
+  if hash_info[:total].size == 1
+    return hash_info[:total][0]
+  else
+    return "#{hash_info[:total][0]} or #{hash_info[:total][1]}"
+  end
+end
+
+def number_of_aces?(hash_info)
+  hash_info[:cards].join.count("A")
 end
 
 deck = shuffle_deck(initialize_deck)
 deal_cards(deck, dealer, player)
 
-dealer[:total] = calculate_total(dealer)
-player[:total] = calculate_total(player)
+p dealer[:total] = return_total(dealer)
+p player[:total] = return_total(player)
 
 display_hands(dealer, player)
 
+p ALL_CARDS.sort
 
