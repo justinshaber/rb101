@@ -76,13 +76,6 @@ def return_total(hash_info)
       return low_total
     end
   end
-
-  
-  # if low_total == high_total
-  #   return [low_total]
-  # else
-  #   return [low_total, high_total]
-  # end
 end
 
 def display_total(hash_info)
@@ -104,6 +97,4 @@ p dealer[:total] = return_total(dealer)
 p player[:total] = return_total(player)
 
 display_hands(dealer, player)
-
-p ALL_CARDS.sort
 
