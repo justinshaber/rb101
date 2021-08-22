@@ -1,1 +1,3 @@
 welcome: "welcome"
+hit_or_stay?: "[H] - Hit, [S] - Stay"
+invalid_response: "Invalid response. Please press [H] to hit and [S] to stay"
