@@ -7,9 +7,6 @@ NUM_CARDS = ("2".."10").to_a
 FACE_CARDS = %w(J Q K A)
 ALL_CARDS = NUM_CARDS + FACE_CARDS
 
-# dealer = { cards: [], total: [], hole_card: false, display_total: false }
-# player = { cards: [], total: [] }
-
 def initialize_players
   dealer = { cards: [], total: [], hole_card: false, display_total: false }
   player = { cards: [], total: [] }
@@ -69,7 +66,7 @@ def display_dealer_cards(dealer_info)
 end
 
 def display_total(hash_info)
-  if hash_info[:total].size == 2
+  if has_low_high_totals?(hash_info)
     return "#{hash_info[:total][0]} or #{hash_info[:total][1]}"
   else
     return hash_info[:total][0]
@@ -116,6 +113,10 @@ def add_aces(non_ace_total, aces)
   return totals
 end
 
+def update_total(hash_info)
+  hash_info[:total] = calculate_total(hash_info)
+end
+
 def has_low_high_totals?(hash_info)
   hash_info[:total].size == 2
 end
@@ -144,7 +145,7 @@ end
 
 def hit(deck, hash_info)
   deal_a_card(deck, hash_info)
-  hash_info[:total] = calculate_total(hash_info)
+  update_total(hash_info)
 end
 
 def players_turn(deck, dealer_info, player_info)
@@ -179,7 +180,6 @@ def dealers_turn(deck, dealer_info, player_info)
     end
     
     hit(deck, dealer_info)
-    display_table(dealer_info, player_info)
   end
 end
 
@@ -190,8 +190,9 @@ end
 def compare_cards(dealer_info, player_info)
   dealer_high_total = dealer_info[:total].select { |x| x < 22 }.max
   player_high_total = player_info[:total].select { |x| x < 22 }.max
+
   return "push" if dealer_high_total == player_high_total
-  dealer_high_total < player_high_total ? "You win" : "You lose"
+  dealer_high_total < player_high_total ? "win" : "lose"
 end
 
 def play_again?()
@@ -206,12 +207,15 @@ def play_again?()
   end
 end
 
-def reset_all_data(dealer_info, player_info)
-  dealer_info = { cards: [], total: [], hole_card: false, display_total: false}
-  player_info = { cards: [], total: []}
+def display_game_over(dealer_info, player_info, message)
+  display_table(dealer_info, player_info)
+  prompt(message)
+end
 
-  dealer_info[:hole_card] = false
-  dealer_info[:display_total] = false
+def update_final_totals(dealer_info, player_info)
+  reveal_dealer_info(dealer_info)
+  remove_low_total(dealer_info) if has_low_high_totals?(dealer_info)
+  remove_low_total(player_info) if has_low_high_totals?(player_info)
 end
 
 while true
@@ -219,64 +223,36 @@ while true
   deck = shuffle_deck(initialize_deck)
   first_deal(deck, dealer, player)
 
-  dealer[:total] = calculate_total(dealer)
-  player[:total] = calculate_total(player)
+  update_total(dealer)
+  update_total(player)
 
   display_table(dealer, player)
 
   if blackjack?(dealer)
-    reveal_dealer_info(dealer)
-    remove_low_total(dealer) if has_low_high_totals?(dealer)
-
-    display_table(dealer, player)
-    puts "Dealer has blackjack. You lose"
-    if play_again?
-      # reset_all_data(dealer, player)
-      next
-    else
-      break
-    end
+    update_final_totals(dealer, player)
+    display_game_over(dealer, player, "dealer_blackjack")
+    play_again? ? next : break
   end
 
   players_turn(deck, dealer, player)
-  reveal_dealer_info(dealer)
-  remove_low_total(player) if has_low_high_totals?(player)
 
   if bust?(player)
-    display_table(dealer, player)
-    puts "You busted! You lose!"
-    if play_again?
-      # reset_all_data(dealer, player)
-      next
-    else
-      break
-    end
+    update_final_totals(dealer, player)
+    display_game_over(dealer, player, "player_busted")
+    play_again? ? next : break
   end
 
   dealers_turn(deck, dealer, player)
-  remove_low_total(dealer) if has_low_high_totals?(dealer)
   
   if bust?(dealer)
-    puts "Dealer busted! You win!" 
-    if play_again?
-      # reset_all_data(dealer, player)
-      next
-    else
-      break
-    end
+    update_final_totals(dealer, player)
+    display_game_over(dealer, player, "dealer_busted")
+    play_again? ? next : break
   end
-
-  display_table(dealer, player)
-
-  puts compare_cards(dealer, player)
-
-  if play_again?
-    # reset_all_data(dealer, player)
-    next
-  else
-    break
-  end
-  # reset_all_data(dealer, player)
+  
+  update_final_totals(dealer, player)
+  display_game_over(dealer, player, compare_cards(dealer, player))
+  play_again? ? next : break
 end
 
 puts "Thanks for playing"
