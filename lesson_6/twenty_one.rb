@@ -7,8 +7,8 @@ NUM_CARDS = ("2".."10").to_a
 FACE_CARDS = %w(J Q K A)
 ALL_CARDS = NUM_CARDS + FACE_CARDS
 
-dealer = { cards: [], total: [], hole_card: false, display_total: false}
-player = { cards: [], total: []}
+dealer = { cards: [], total: [], hole_card: false, display_total: false }
+player = { cards: [], total: [] }
 
 def prompt(message, options = '')
   puts format("=> #{MESSAGE[message]}", options: options)
@@ -104,6 +104,10 @@ def add_aces(non_ace_total, aces)
   return totals
 end
 
+def blackjack?(hash_info)
+  hash_info[:total].any? { |total| total == 21 }
+end
+
 def hit_or_stay?(deck, player_info)
   loop do
     prompt("hit_or_stay?")
@@ -121,6 +125,17 @@ end
 
 def players_turn(deck, dealer_info, player_info)
   loop do
+    if blackjack?(player_info)
+      dealer_info[:hole_card] = true
+      dealer_info[:display_total] = true
+      if player_info[:total].size == 2 # if the player stays, and there are two totals, remove the lowest total
+        player_info[:total].delete(player_info[:total].min)
+      end
+      puts "21!"
+      sleep 2
+      break
+    end
+
     choice = hit_or_stay?(deck, player_info)
     if choice == 'h'
       hit(deck, player_info)
@@ -129,9 +144,9 @@ def players_turn(deck, dealer_info, player_info)
     if choice == 's' || bust?(player_info)
       dealer_info[:hole_card] = true
       dealer_info[:display_total] = true
-      # if player_info[:total].size == 2 # if the player stays, and there are two totals, remove the lowest total
-      #   player_info[:total].delete(player_info[:total].min)
-      # end
+      if player_info[:total].size == 2 # if the player stays, and there are two totals, remove the lowest total
+        player_info[:total].delete(player_info[:total].min)
+      end
       break
     end
   end
@@ -139,13 +154,22 @@ end
 
 def dealers_turn(deck, dealer_info, player_info)
   loop do
+    if blackjack?(dealer_info)
+      if dealer_info[:total].size == 2
+        dealer_info[:total].delete(dealer_info[:total].min)
+      end
+      puts "Dealer has 21"
+      sleep 2
+      break
+    end
+
     if dealer_info[:total].size == 1
       break if dealer_info[:total][0] >= 17
     end
 
     if dealer_info[:total].size == 2 
       if dealer_info[:total].max >= 18
-          # dealer_info[:total].delete(dealer_info[:total].min)
+          dealer_info[:total].delete(dealer_info[:total].min)
           break
       end
     end
@@ -192,7 +216,20 @@ loop do
 
   display_table(dealer, player)
 
+  if blackjack?(dealer)
+    dealer[:hole_card] = true
+    dealer[:display_total] = true
+    if dealer[:total].size == 2
+      dealer_info[:total].delete(dealer_info[:total].min)
+    end
+
+    display_table(dealer, player)
+    puts "Dealer has blackjack. You lose"
+    break
+  end
+
   players_turn(deck, dealer, player)
+
   if bust?(player)
     display_table(dealer, player)
     puts "You busted! You lose!"
