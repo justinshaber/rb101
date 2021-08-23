@@ -4,9 +4,8 @@ MESSAGE = YAML.load_file('twenty_one_messages.yml')
 
 SUITS = %w(c d h s)
 NUM_CARDS = ("2".."10").to_a 
-FACE_CARDS = %w(J Q K)
-ACE = %w(A)
-ALL_CARDS = NUM_CARDS + FACE_CARDS + ACE
+FACE_CARDS = %w(J Q K A)
+ALL_CARDS = NUM_CARDS + FACE_CARDS
 LOW_ACE = 1
 HIGH_ACE = 11
 
@@ -66,28 +65,25 @@ def calculate_total(hash_info)
   non_ace_total = non_ace_values.sum
 
   if aces.size == 1
-    low_total = non_ace_total + LOW_ACE
-    high_total = non_ace_total + HIGH_ACE
-
-    totals = []
-    totals << low_total if low_total <= 21
-    totals << high_total if high_total <= 21
-
-    return totals
+    return add_aces(non_ace_total, 1)
   end
 
   if aces.size == 2
-    low_total = non_ace_total + LOW_ACE + LOW_ACE
-    high_total = non_ace_total + HIGH_ACE + LOW_ACE
-
-    totals = []
-    totals << low_total if low_total <= 21
-    totals << high_total if high_total <= 21
-
-    return totals
+    return add_aces(non_ace_total, 2)
   end
 
   [non_ace_total]
+end
+
+def add_aces(non_ace_total, aces)
+  low_total = non_ace_total + aces
+  high_total = non_ace_total + 10 + aces
+
+  totals = []
+  totals << low_total if low_total <= 21
+  totals << high_total if high_total <= 21
+
+  return totals
 end
 
 def display_total(hash_info)
@@ -142,8 +138,9 @@ def bust?(hash_info)
 end
 
 def compare_cards(dealer_info, player_info)
-  dealer_high_total = dealer_info[:total].select { |x| x < 21 }.max
-  player_high_total = player_info[:total].select { |x| x < 21 }.max
+  dealer_high_total = dealer_info[:total].select { |x| x < 22 }.max
+  player_high_total = player_info[:total].select { |x| x < 22 }.max
+  return "push" if dealer_high_total == player_high_total
   dealer_high_total < player_high_total ? "You win" : "You lose"
 end
 
