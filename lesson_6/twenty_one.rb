@@ -7,8 +7,15 @@ NUM_CARDS = ("2".."10").to_a
 FACE_CARDS = %w(J Q K A)
 ALL_CARDS = NUM_CARDS + FACE_CARDS
 
-dealer = { cards: [], total: [], hole_card: false, display_total: false }
-player = { cards: [], total: [] }
+# dealer = { cards: [], total: [], hole_card: false, display_total: false }
+# player = { cards: [], total: [] }
+
+def initialize_players
+  dealer = { cards: [], total: [], hole_card: false, display_total: false }
+  player = { cards: [], total: [] }
+
+  [dealer, player]
+end
 
 def prompt(message, options = '')
   puts format("=> #{MESSAGE[message]}", options: options)
@@ -73,6 +80,11 @@ def display_dealer_total(dealer_info)
   dealer_info[:display_total] ? display_total(dealer_info) : "?"
 end
 
+def reveal_dealer_info(dealer_info)
+  dealer_info[:hole_card] = true
+  dealer_info[:display_total] = true
+end
+
 def calculate_total(hash_info)
   non_ace_cards, aces = hash_info[:cards].partition { |card| card[0] != "A" }
   non_ace_values = []
@@ -104,6 +116,18 @@ def add_aces(non_ace_total, aces)
   return totals
 end
 
+def has_low_high_totals?(hash_info)
+  hash_info[:total].size == 2
+end
+
+def only_one_total?(hash_info)
+  hash_info[:total].size == 1
+end
+
+def remove_low_total(hash_info)
+  hash_info[:total].delete(hash_info[:total].min)
+end
+
 def blackjack?(hash_info)
   hash_info[:total].any? { |total| total == 21 }
 end
@@ -125,52 +149,32 @@ end
 
 def players_turn(deck, dealer_info, player_info)
   loop do
-    if blackjack?(player_info)
-      dealer_info[:hole_card] = true
-      dealer_info[:display_total] = true
-      if player_info[:total].size == 2 # if the player stays, and there are two totals, remove the lowest total
-        player_info[:total].delete(player_info[:total].min)
-      end
-      puts "21!"
-      sleep 2
-      break
-    end
+    break if blackjack?(player_info)
 
     choice = hit_or_stay?(deck, player_info)
     if choice == 'h'
       hit(deck, player_info)
       display_table(dealer_info, player_info)
     end
-    if choice == 's' || bust?(player_info)
-      dealer_info[:hole_card] = true
-      dealer_info[:display_total] = true
-      if player_info[:total].size == 2 # if the player stays, and there are two totals, remove the lowest total
-        player_info[:total].delete(player_info[:total].min)
-      end
-      break
-    end
+    break if choice == 's' || bust?(player_info)
   end
 end
 
 def dealers_turn(deck, dealer_info, player_info)
   loop do
     if blackjack?(dealer_info)
-      if dealer_info[:total].size == 2
-        dealer_info[:total].delete(dealer_info[:total].min)
-      end
-      puts "Dealer has 21"
-      sleep 2
+      remove_low_total(dealer_info) if has_low_high_totals?(dealer_info)
       break
     end
 
-    if dealer_info[:total].size == 1
+    if only_one_total?(dealer_info)
       break if dealer_info[:total][0] >= 17
     end
 
-    if dealer_info[:total].size == 2 
+    if has_low_high_totals?(dealer_info) 
       if dealer_info[:total].max >= 18
-          dealer_info[:total].delete(dealer_info[:total].min)
-          break
+        remove_low_total(dealer_info)
+        break
       end
     end
     
@@ -205,9 +209,13 @@ end
 def reset_all_data(dealer_info, player_info)
   dealer_info = { cards: [], total: [], hole_card: false, display_total: false}
   player_info = { cards: [], total: []}
+
+  dealer_info[:hole_card] = false
+  dealer_info[:display_total] = false
 end
 
-loop do
+while true
+  dealer, player = initialize_players
   deck = shuffle_deck(initialize_deck)
   first_deal(deck, dealer, player)
 
@@ -217,41 +225,57 @@ loop do
   display_table(dealer, player)
 
   if blackjack?(dealer)
-    dealer[:hole_card] = true
-    dealer[:display_total] = true
-    if dealer[:total].size == 2
-      dealer_info[:total].delete(dealer_info[:total].min)
-    end
+    reveal_dealer_info(dealer)
+    remove_low_total(dealer) if has_low_high_totals?(dealer)
 
     display_table(dealer, player)
     puts "Dealer has blackjack. You lose"
-    break
+    if play_again?
+      # reset_all_data(dealer, player)
+      next
+    else
+      break
+    end
   end
 
   players_turn(deck, dealer, player)
+  reveal_dealer_info(dealer)
+  remove_low_total(player) if has_low_high_totals?(player)
 
   if bust?(player)
     display_table(dealer, player)
     puts "You busted! You lose!"
-    break 
-    # if play_again?
-    #   reset_all_data
-    #   break
-    # end
+    if play_again?
+      # reset_all_data(dealer, player)
+      next
+    else
+      break
+    end
   end
 
   dealers_turn(deck, dealer, player)
+  remove_low_total(dealer) if has_low_high_totals?(dealer)
   
   if bust?(dealer)
     puts "Dealer busted! You win!" 
-    break
+    if play_again?
+      # reset_all_data(dealer, player)
+      next
+    else
+      break
+    end
   end
 
   display_table(dealer, player)
 
-  p compare_cards(dealer, player)
+  puts compare_cards(dealer, player)
 
-  break
+  if play_again?
+    # reset_all_data(dealer, player)
+    next
+  else
+    break
+  end
   # reset_all_data(dealer, player)
 end
 
