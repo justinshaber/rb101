@@ -7,15 +7,18 @@ NUM_CARDS = ("2".."10").to_a
 FACE_CARDS = %w(J Q K A)
 ALL_CARDS = NUM_CARDS + FACE_CARDS
 
-def initialize_players
+players_bank = 100
+MIN_BET = 5
+
+def initialize_players(bank_amount)
   dealer = { cards: [], total: [], hole_card: false, display_total: false }
-  player = { cards: [], total: [], bank: 100, bet: nil }
+  player = { cards: [], total: [], bank: bank_amount, bet: nil }
 
   [dealer, player]
 end
 
-def prompt(message, options = '')
-  puts format("=> #{MESSAGE[message]}", options: options)
+def prompt(message, options = '', option2 = '')
+  puts format("=> #{MESSAGE[message]}", options: options, option2: option2)
 end
 
 def initialize_deck
@@ -194,16 +197,16 @@ def play_again?
     prompt('cash_or_bet')
     answer = gets.chomp
 
-    return true if answer.downcase == '$'
-    return false if answer.downcase == 'c'
+    return true if answer.downcase == 'b'
+    return false if answer.downcase == '$'
 
-    prompt('invalid_choice', "[c] or [$]")
+    prompt('invalid_choice', "[$] or [b]")
   end
 end
 
 def display_game_over(dealer_info, player_info, message)
   display_table(dealer_info, player_info)
-  prompt(message)
+  prompt(message, player_info[:bank])
 end
 
 def update_final_totals(dealer_info, player_info)
@@ -212,58 +215,155 @@ def update_final_totals(dealer_info, player_info)
   remove_low_total(player_info) if soft_high_total?(player_info)
 end
 
+def is_integer?(num)
+  num.to_s.to_i.to_s == num.to_s
+end
+
 def bet(bank)
   prompt('bet', bank)
   answer = nil
 
   loop do
-    answer = gets.to_i
-    break if answer.to_s.to_i == answer
-    prompt('invalid_choice')
+    answer = gets.chomp
+
+    if is_integer?(answer)
+      answer = answer.to_i
+      break if answer >= MIN_BET && answer <= bank
+    end
+    prompt('invalid_choice', bank)
   end
 
   answer
 end
 
-loop do
-  dealer, player = initialize_players
-  deck = shuffle_deck(initialize_deck)
-
-  prompt('welcome')
-  player[:bet] = bet(player[:bank])
-  player[:bank] -= player[:bet]
-  first_deal(deck, dealer, player)
-
-  update_total(dealer)
-  update_total(player)
-
-  display_table(dealer, player)
-
-  if blackjack?(dealer)
-    update_final_totals(dealer, player)
-    display_game_over(dealer, player, "dealer_blackjack")
-    play_again? ? next : break
-  end
-
-  players_turn(deck, dealer, player)
-
-  if bust?(player)
-    update_final_totals(dealer, player)
-    display_game_over(dealer, player, "player_busted")
-    play_again? ? next : break
-  end
-
-  dealers_turn(deck, dealer)
-
-  if bust?(dealer)
-    update_final_totals(dealer, player)
-    display_game_over(dealer, player, "dealer_busted")
-    play_again? ? next : break
-  end
-
-  update_final_totals(dealer, player)
-  display_game_over(dealer, player, compare_cards(dealer, player))
-  break unless play_again?
+def win_loss_amount(player_info, hand_result)
+  return -player_info[:bet] if hand_result == "lose"
+  return player_info[:bet] if hand_result == "win"
+  return 0 if hand_result == "push"
 end
 
-puts "Thanks for playing"
+def no_money?(players_bank)
+  players_bank < 5
+end
+
+def goodbye(players_bank)
+  profit_loss = players_bank - 100
+  prompt('thank_you')
+
+  if no_money?(players_bank)
+    return prompt('lost_it_all', profit_loss.abs, players_bank)
+  end
+
+  case profit_loss
+  when 0 then prompt('broke_even')
+  when (1..) then prompt('won_money', profit_loss, players_bank)
+  else prompt('lost_money', profit_loss.abs, players_bank)
+  end
+end
+
+def hit_the_atm?()
+  loop do
+    prompt('hit_the_atm')
+    answer = gets.chomp
+
+    return true if answer.downcase == '$'
+    return false if answer.downcase == 'exit'
+    system 'clear'
+    prompt('invalid_input')
+  end
+end
+
+loop do
+  prompt('welcome')
+
+  loop do
+    dealer, player = initialize_players(players_bank)
+    deck = shuffle_deck(initialize_deck)
+    
+    player[:bet] = bet(player[:bank])
+    player[:bank] -= player[:bet]
+    players_bank -= player[:bet]
+
+    first_deal(deck, dealer, player)
+
+    update_total(dealer)
+    update_total(player)
+
+    display_table(dealer, player)
+
+    if blackjack?(dealer)
+      update_final_totals(dealer, player)
+
+      if blackjack?(player)
+        display_game_over(dealer, player, "both_blackjack")
+      else
+        #players_bank -= player[:bet]
+        display_game_over(dealer, player, "dealer_blackjack")
+      end
+
+      break if no_money?(players_bank)
+      play_again? ? next : break
+    end
+
+    players_turn(deck, dealer, player)
+
+    if bust?(player)
+      update_final_totals(dealer, player)
+      #players_bank -= player[:bet]
+      display_game_over(dealer, player, "player_busted")
+      
+
+      break if no_money?(players_bank)
+      play_again? ? next : break
+    end
+
+    dealers_turn(deck, dealer)
+
+    if bust?(dealer)
+      update_final_totals(dealer, player)
+      
+      if blackjack?(player)
+        players_bank += ((player[:bet] * 2) + (player[:bet] / 2)) 
+        player[:bank] += ((player[:bet] * 2) + (player[:bet] / 2))
+      else
+        players_bank += (player[:bet] * 2)
+        player[:bank] += (player[:bet] * 2)
+      end
+      display_game_over(dealer, player, "dealer_busted")
+      
+
+      break if no_money?(players_bank)
+      play_again? ? next : break
+    end
+
+    update_final_totals(dealer, player)
+    result = compare_cards(dealer, player)
+    # players_bank += win_loss_amount(player, result)
+    if result == "win"
+      if blackjack?(player)
+        players_bank += ((player[:bet] * 2) + (player[:bet] / 2))
+        player[:bank] += ((player[:bet] * 2) + (player[:bet] / 2))
+      else
+        players_bank += (player[:bet] * 2)
+        player[:bank] += (player[:bet] * 2)
+      end
+    end
+    players_bank += player[:bet] if result == "push"
+    display_game_over(dealer, player, result)
+    
+
+    break if no_money?(players_bank)
+    break unless play_again?
+  end
+
+  goodbye(players_bank)
+
+  if no_money?(players_bank)
+    if hit_the_atm?
+      players_bank = 100
+      next
+    end
+  end
+
+  break
+end
