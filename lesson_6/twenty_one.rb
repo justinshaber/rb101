@@ -36,7 +36,7 @@ def shuffle_deck(deck)
   deck.shuffle!
 end
 
-def is_integer?(num)
+def integer?(num)
   num.to_s.to_i.to_s == num.to_s
 end
 
@@ -47,7 +47,7 @@ def bet(bank)
   loop do
     answer = gets.chomp
 
-    if is_integer?(answer)
+    if integer?(answer)
       answer = answer.to_i
       break if answer >= MIN_BET && answer <= bank
     end
@@ -244,7 +244,7 @@ def win_loss_amount(player_info, hand_result)
   when "blackjack"  then (original_bet + blackjack_winnings)
   when "normal_win" then (original_bet + original_bet)
   when "push"       then original_bet
-  end 
+  end
 end
 
 def no_money?(players_bank)
@@ -259,10 +259,10 @@ def goodbye(players_bank)
     return prompt('lost_it_all', profit_loss.abs, players_bank)
   end
 
-  case profit_loss
-  when 0     then prompt('broke_even')
-  when (1..) then prompt('won_money', profit_loss, players_bank)
-  else            prompt('lost_money', profit_loss.abs, players_bank)
+  case
+  when profit_loss < 0 then prompt('lost_money', profit_loss.abs, players_bank)
+  when profit_loss > 0 then prompt('won_money', profit_loss, players_bank)
+  else prompt('broke_even')
   end
 end
 
@@ -286,7 +286,7 @@ loop do
   loop do
     dealer, player = initialize_players(players_bank)
     deck = shuffle_deck(initialize_deck)
-    
+
     player[:bet] = bet(player[:bank])
     player[:bank] -= player[:bet]
     players_bank -= player[:bet]
@@ -323,9 +323,9 @@ loop do
 
     if bust?(dealer)
       update_final_totals(dealer, player)
-      
+
       if blackjack?(player)
-        players_bank += win_loss_amount(player, 'blackjack') 
+        players_bank += win_loss_amount(player, 'blackjack')
         player[:bank] += win_loss_amount(player, 'blackjack')
       else
         players_bank += win_loss_amount(player, 'normal_win')
@@ -340,7 +340,7 @@ loop do
     result = compare_cards(dealer, player)
     if result == "win"
       if blackjack?(player)
-        players_bank += win_loss_amount(player, 'blackjack') 
+        players_bank += win_loss_amount(player, 'blackjack')
         player[:bank] += win_loss_amount(player, 'blackjack')
       else
         players_bank += win_loss_amount(player, 'normal_win')
