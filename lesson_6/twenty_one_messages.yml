@@ -1,4 +1,4 @@
-welcome: "Welcome to blackjack! This is a $5 min game which pays 3 to 2 for Blackjack.\n
+welcome: "Welcome to Blackjack! This is a $5 min game which pays 3 to 2 for Blackjack.\n
 => The Blackjack fairy has given you $100! Good luck!"
 bet: "Place your bet by entering an amount from $5 - $%{options}"
 hit_or_stay?: "[H] - Hit, [S] - Stay"
