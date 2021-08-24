@@ -1,4 +1,5 @@
-welcome: "welcome"
+welcome: "Welcome to blackjack! The Blackjack fairy has given you $100! Good luck!"
+bet: "How much would you like to bet? Enter a number from 5 - %{options}"
 hit_or_stay?: "[H] - Hit, [S] - Stay"
 invalid_response: "Invalid response. Please press [H] to hit and [S] to stay"
 invalid_choice: "Invalid choice. Please choose %{options}"

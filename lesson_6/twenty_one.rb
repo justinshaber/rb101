@@ -3,13 +3,13 @@ require 'yaml'
 MESSAGE = YAML.load_file('twenty_one_messages.yml')
 
 SUITS = %w(c d h s)
-NUM_CARDS = ("2".."10").to_a 
+NUM_CARDS = ("2".."10").to_a
 FACE_CARDS = %w(J Q K A)
 ALL_CARDS = NUM_CARDS + FACE_CARDS
 
 def initialize_players
   dealer = { cards: [], total: [], hole_card: false, display_total: false }
-  player = { cards: [], total: [] }
+  player = { cards: [], total: [], bank: 100, bet: nil }
 
   [dealer, player]
 end
@@ -44,20 +44,24 @@ def deal_a_card(deck, hash_info)
   hash_info[:cards] << deck.shift
 end
 
-def display_table(dealer_hash, player_hash)
+def display_table(deal_hash, player_hash)
   system 'clear'
   puts "     Dealer"
-  puts "    #{display_dealer_cards(dealer_hash)} ==> #{display_dealer_total(dealer_hash)}"
+  puts "    #{show_dealer_cards(deal_hash)} ==> #{show_dealer_total(deal_hash)}"
   puts ""
-  puts "     #{display_cards(player_hash)} ==> #{display_total(player_hash)}"
+  puts "    You bet: $#{player_hash[:bet]}"
+  puts ""
+  puts "    #{display_cards(player_hash)} ==> #{display_total(player_hash)}"
   puts "     Player"
+  puts "      $#{player_hash[:bank]}"
+  puts ""
 end
 
 def display_cards(player_info)
   player_info[:cards].map { |card| "|#{card}|" }.join(" ")
 end
 
-def display_dealer_cards(dealer_info)
+def show_dealer_cards(dealer_info)
   if dealer_info[:hole_card]
     display_cards(dealer_info)
   else
@@ -66,14 +70,16 @@ def display_dealer_cards(dealer_info)
 end
 
 def display_total(hash_info)
-  if has_low_high_totals?(hash_info)
-    return "#{hash_info[:total][0]} or #{hash_info[:total][1]}"
+  return "Blackjack!" if hash_info[:cards].size == 2 && blackjack?(hash_info)
+
+  if soft_high_total?(hash_info)
+    "#{hash_info[:total][0]} or #{hash_info[:total][1]}"
   else
-    return hash_info[:total][0]
+    hash_info[:total][0]
   end
 end
 
-def display_dealer_total(dealer_info)
+def show_dealer_total(dealer_info)
   dealer_info[:display_total] ? display_total(dealer_info) : "?"
 end
 
@@ -87,11 +93,7 @@ def calculate_total(hash_info)
   non_ace_values = []
 
   non_ace_cards.each do |card|
-    if NUM_CARDS.include?(card[0])
-      non_ace_values << card[0].to_i
-    else
-      non_ace_values << 10
-    end
+    non_ace_values << (NUM_CARDS.include?(card[0]) ? card[0].to_i : 10)
   end
 
   non_ace_total = non_ace_values.sum
@@ -110,19 +112,23 @@ def add_aces(non_ace_total, aces)
   totals << low_total if low_total
   totals << high_total if high_total <= 21
 
-  return totals
+  totals
 end
 
 def update_total(hash_info)
   hash_info[:total] = calculate_total(hash_info)
 end
 
-def has_low_high_totals?(hash_info)
+def soft_high_total?(hash_info)
   hash_info[:total].size == 2
 end
 
-def only_one_total?(hash_info)
-  hash_info[:total].size == 1
+def hard_total(hash_info)
+  hash_info[:total][0]
+end
+
+def soft_total(hash_info)
+  hash_info[:total][1]
 end
 
 def remove_low_total(hash_info)
@@ -133,7 +139,7 @@ def blackjack?(hash_info)
   hash_info[:total].any? { |total| total == 21 }
 end
 
-def hit_or_stay?(deck, player_info)
+def hit_or_stay?
   loop do
     prompt("hit_or_stay?")
     answer = gets.chomp.downcase
@@ -152,7 +158,7 @@ def players_turn(deck, dealer_info, player_info)
   loop do
     break if blackjack?(player_info)
 
-    choice = hit_or_stay?(deck, player_info)
+    choice = hit_or_stay?
     if choice == 'h'
       hit(deck, player_info)
       display_table(dealer_info, player_info)
@@ -161,24 +167,12 @@ def players_turn(deck, dealer_info, player_info)
   end
 end
 
-def dealers_turn(deck, dealer_info, player_info)
+def dealers_turn(deck, dealer_info)
   loop do
-    if blackjack?(dealer_info)
-      remove_low_total(dealer_info) if has_low_high_totals?(dealer_info)
-      break
-    end
+    break if blackjack?(dealer_info)
+    break if hard_total(dealer_info) >= 17
+    break if soft_high_total?(dealer_info) && soft_total(dealer_info) >= 18
 
-    if only_one_total?(dealer_info)
-      break if dealer_info[:total][0] >= 17
-    end
-
-    if has_low_high_totals?(dealer_info) 
-      if dealer_info[:total].max >= 18
-        remove_low_total(dealer_info)
-        break
-      end
-    end
-    
     hit(deck, dealer_info)
   end
 end
@@ -195,7 +189,7 @@ def compare_cards(dealer_info, player_info)
   dealer_high_total < player_high_total ? "win" : "lose"
 end
 
-def play_again?()
+def play_again?
   loop do
     prompt('cash_or_bet')
     answer = gets.chomp
@@ -214,13 +208,30 @@ end
 
 def update_final_totals(dealer_info, player_info)
   reveal_dealer_info(dealer_info)
-  remove_low_total(dealer_info) if has_low_high_totals?(dealer_info)
-  remove_low_total(player_info) if has_low_high_totals?(player_info)
+  remove_low_total(dealer_info) if soft_high_total?(dealer_info)
+  remove_low_total(player_info) if soft_high_total?(player_info)
 end
 
-while true
+def bet(bank)
+  prompt('bet', bank)
+  answer = nil
+
+  loop do
+    answer = gets.to_i
+    break if answer.to_s.to_i == answer
+    prompt('invalid_choice')
+  end
+
+  answer
+end
+
+loop do
   dealer, player = initialize_players
   deck = shuffle_deck(initialize_deck)
+
+  prompt('welcome')
+  player[:bet] = bet(player[:bank])
+  player[:bank] -= player[:bet]
   first_deal(deck, dealer, player)
 
   update_total(dealer)
@@ -242,17 +253,17 @@ while true
     play_again? ? next : break
   end
 
-  dealers_turn(deck, dealer, player)
-  
+  dealers_turn(deck, dealer)
+
   if bust?(dealer)
     update_final_totals(dealer, player)
     display_game_over(dealer, player, "dealer_busted")
     play_again? ? next : break
   end
-  
+
   update_final_totals(dealer, player)
   display_game_over(dealer, player, compare_cards(dealer, player))
-  play_again? ? next : break
+  break unless play_again?
 end
 
 puts "Thanks for playing"
