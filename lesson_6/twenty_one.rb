@@ -259,10 +259,12 @@ def goodbye(players_bank)
     return prompt('lost_it_all', profit_loss.abs, players_bank)
   end
 
-  case
-  when profit_loss < 0 then prompt('lost_money', profit_loss.abs, players_bank)
-  when profit_loss > 0 then prompt('won_money', profit_loss, players_bank)
-  else prompt('broke_even')
+  if profit_loss < 0
+    prompt('lost_money', profit_loss.abs, players_bank)
+  elsif profit_loss > 0
+    prompt('won_money', profit_loss, players_bank)
+  else
+    prompt('broke_even')
   end
 end
 
