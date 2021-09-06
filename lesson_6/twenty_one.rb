@@ -1,3 +1,10 @@
+# Major surgery to fix redundancy counting players money
+# Add unicode characters
+# Indicate number below player is amount left in bank
+# case to if-else-if on 262
+# previous feedback
+# String#strip
+
 require 'yaml'
 MESSAGE = YAML.load_file('twenty_one_messages.yml')
 
