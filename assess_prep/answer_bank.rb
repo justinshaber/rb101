@@ -29,6 +29,30 @@
 =end
 
 ###VARIABLE SCOPE###
+  # a = 4
+  # b = 2
+
+  # loop do  
+  #   c = 3
+  #   a = c
+  #   break
+  # end
+
+  # puts a
+  # puts b
+
+=begin
+  When we call the puts method on line 10, 3 is passed as an argument and output to the screen.
+    When we call the puts method on line 11, 2 is passed as an argument and output to the screen. Both invocations
+    return `nil`.
+
+  The value of local variable `b` remains 2, and is also printed to the screen. `Loop do..end` creates a block with an
+    inner scope. Inner scope can access variables initialized in an outer scope, but not vice versa. As a result,
+    local variable `a` is allowed to be reassigned  within the block on line 6 because it was initialized in an
+    outer scope on line 1.
+=end
+
+
   # def some_method(number)
   #   number = 7
   # end
@@ -60,13 +84,13 @@
     which allowed the code to reassign the value of 'a'. 
 =end
 
-  a = 'Bob'
+  # a = 'Bob'
 
-  def test_times(x)
-    a = 'Bill'
-  end
+  # def test_times(x)
+  #   a = 'Bill'
+  # end
 
-  p a
+  # p a
 
 =begin
   The `test_times` method definition creates a self-contained scope. You can't refer to or modify any variables
@@ -115,6 +139,20 @@
 
 
 ###COLLECTIONS###
+  { a: "ant", b: "bear", c: "cat" }.all? do |key, value|
+    value.length >= 3
+  end
+
+=begin
+  The code snippet returns boolean `true`.
+  the `all` method is being invoked on the hash `{ a: "ant", b: "bear", c: "cat" }`. `all` iterates
+    through each element of the hash and returns a boolean true if every passed block evaluates to
+    true. If any block does not evaluate as true, the method will not iterate further and return boolean false.
+
+  `value.length >= 3` implicitly returns a boolean because the the evaluated value of the last line in a block is always returned. 
+
+=end
+
 ###TRUTHINESS###
 ###METHOD DEFINITION v INVOKE###
 ###IMPLICIT RETURN VALUE###
