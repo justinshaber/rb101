@@ -15,6 +15,13 @@ Always aim to answer:
 
 ###VARIABLES AS POINTERS###
 ###VARIABLE SCOPE###
+  Inner scope can access variables initialized in an outer scope, but not vice versa.
+  variable scope is defined by a *method DEFINITION* or a block.
+  method have self-contained scope - you can't refer to or modify any variables that aren't initialized within
+    the method. Variables initialized within the method are not available outside the method's body.
+  block - piece of code that follows a *method INVOCATION*, delimited by `{}` or `do/end`
+    `do/end` and `{}` are the blocks! It becomes a block following method invocation.
+
 ###MUTATING v NON_MUTATING###
   `a << "str"` - mutates the caller and modifies the existing [object] (str), which is also pointed to by variable 'b'
 ###COLLECTIONS###

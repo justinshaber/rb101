@@ -43,16 +43,51 @@
   `number` is scoped at the method definitiion level.
 =end
 
-###MUTATING v NON_MUTATING###
-  a = [1, 2, 3]
-  
-  def mutate(array)
-    array.pop
+  # a = 'Bob'
+
+  # 5.times do |x|
+  #   a = 'Bill'
+  # end
+
+  # p a
+
+=begin 
+  `5.times do ... end` creates a block with an inner scope. Inner scope can access variables initialized in an outer scope,
+    but not vice versa. As a result, the value of `a` is allowed to be reassigned because it was initialized in an outer
+    scope. At the end of the program local variable `a` points to new string `'Bill'`, and is printed to the console.
+
+  The value of `a` is 3. This is because `a` is available to the inner scope created by `5.times do ... end`,
+    which allowed the code to reassign the value of 'a'. 
+=end
+
+  a = 'Bob'
+
+  def test_times(x)
+    a = 'Bill'
   end
 
-  p "Before #{a}"
-  mutate(a)
-  p "After #{a}"
+  p a
+
+=begin
+  The `test_times` method definition creates a self-contained scope. You can't refer to or modify any variables
+    that aren't initialized within the method. As a result, local variable `a` is not allowed to be reassigned
+    within the method body, so at the end of the program, `a` still points to string `Bob`.
+
+  The local variable `a` points to string `'Bob'`. This is because `a`, initialized outside the method definition on line 1,
+    is not available within the self-contained scope created by the method definition, and cannot be accessed or modified.
+=end
+
+
+###MUTATING v NON_MUTATING###
+  # a = [1, 2, 3]
+  
+  # def mutate(array)
+  #   array.pop
+  # end
+
+  # p "Before #{a}"
+  # mutate(a)
+  # p "After #{a}"
 
 =begin
   The program permanently modified the array that local variable `a` references by passing it to the mutate method, even though
