@@ -3,6 +3,39 @@
 # What concept does it demonstrate?
 
 ###PUTS v RETURN###
+# def count_sheep
+#   5.times do |sheep|
+#     puts sheep
+#     if sheep >= 2
+#       return
+#     end
+#   end
+# end
+
+# p count_sheep
+
+=begin
+  On line 10, when `count_sheep` is called, `0, 1, 2` is output to the console. The return value of `count_sheep` is then passed to the
+  `p` method call, which prints `nil` to the console.
+
+  The times method calls the given block once for each integer from 0 to the number it was called on, passing that integer as a parameter.
+
+  On line 2, the times method is called on the integer 5, and passed the `do..end` block as an argument. A `times` loop is zero-based, 
+  and therefore, on line 2, local variable `sheep` is initialized to integer 0 within the first iteration of the loop.
+  On line 3, we are calling the puts method and pass it the current integer value assigned to sheep as an argument. On the first iteration,
+  this invocation will output `"0"` and return nil.
+
+  On line 4, `sheep >= 2` is evaluated using the current integer value assigned to sheep. Within the first iteration, the expression `0 >= 2`
+  evaluates as `false` and the code does not enter into the `if` statement. The code then moves to the next iteration of the times loop,
+  reassigning local variable `sheep` to integer `1`. The code repeats the same process, outputting `1` to the console, not entering the `if`
+  statement, and moving to the next iteration where local variable `sheep` is reassigned to integer `2`.
+
+  When local variable `sheep` points to integer `2`, On line 3, we are calling the puts method and passing integer `2` as an argument. This
+  invocation will output `"2"` and return nil. On line 4, the expression `2 >= 2` evaluates as true, and the `if` statement is entered.
+
+
+=end
+
 ###VARIABLES AS POINTERS###
   # a = "hi there"
   # b = a
@@ -29,10 +62,32 @@
 =end
 
 ###VARIABLE SCOPE###
+
+a = 7
+array = [1, 2, 3]
+
+array.each do |element|
+  a = element
+end
+
+puts a
+
+=begin
+  The code will output `"3"` to the console and return `nil`.
+
+  The each method calls the given block once for each element in the collection it is called on, passing that element as a parameter.
+  On line 4, `each` method is called on `array` which was initialized on line 2 to point to `[1, 2, 3]`. Within each iteration, local
+  variable `a` is reassigned to the current element. After the final iteration, local variable  `a` is reassigned to integer `3`, 
+  the last element in `array`.
+
+  On line 8, we are calling the puts method and pass it the integer `3`, which is pointed to by local variable `a`, as an argument.
+  This invocation will output `3` and return `nil`.
+=end
+
   # a = 4
   # b = 2
 
-  # loop do  
+  # loop do
   #   c = 3
   #   a = c
   #   break
@@ -139,11 +194,12 @@
 
 
 ###COLLECTIONS###
-  { a: "ant", b: "bear", c: "cat" }.all? do |key, value|
-    value.length >= 3
-  end
+  # { a: "ant", b: "bear", c: "cat" }.all? do |key, value|
+  #   value.length >= 3
+  # end
 
 =begin
+    ++++
   The code snippet returns boolean `true`.
   the `all` method is being invoked on the hash `{ a: "ant", b: "bear", c: "cat" }`. `all` iterates
     through each element of the hash and returns a boolean true if every passed block evaluates to
@@ -154,6 +210,23 @@
 =end
 
 ###TRUTHINESS###
+
+# number = 7
+
+# if number
+#   puts "My favorite number is #{number}."
+# else
+#   puts "I don't have a favorite number."
+# end
+
+=begin
+  The program will output `"My favorite number is 7."` to the console and return `nil`.
+
+  In Ruby, any value apart from 'nil' or false is considered truthy. Therefore, on line 3, local variable `number`, which points to integer `7`,
+  evaluates to true. As a result, on line 4, we are calling the puts method and pass it the String "My favorite number is #{number}." as an argument. This
+  invocation will output "My favorite number is 7." and return `nil`.
+=end
+
 ###METHOD DEFINITION v INVOKE###
 ###IMPLICIT RETURN VALUE###
   # def add_three(number)
