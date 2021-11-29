@@ -28,6 +28,7 @@ Always aim to answer:
 ###TRUTHINESS###
 ###METHOD DEFINITION v INVOKE###
 ###IMPLICIT RETURN VALUE###
+  "The evaluated result of the last line of the method."
 ###ARRAY.SORT###
 =end
 

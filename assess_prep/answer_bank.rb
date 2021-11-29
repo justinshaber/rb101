@@ -3,31 +3,59 @@
 # What concept does it demonstrate?
 
 ###PUTS v RETURN###
-# def count_sheep
-#   5.times do |sheep|
-#     puts sheep
-#     if sheep >= 2
-#       return
-#     end
-#   end
-# end
+def count_sheep
+  5.times do |sheep|
+    puts sheep
+    if sheep >= 2
+      return
+    end
+  end
+end
 
-# p count_sheep
+p count_sheep
 
 =begin
-  On line 10, when `count_sheep` is called, `0, 1, 2` is output to the console. The return value of `count_sheep` is then passed to the
+  concepts - puts vs return, implicit return value (explicit return overrides implicit return)
+
+  On lines 1-8 we have a method definition for the method `count_sheep`. Within that method we invoke the `Integer#times` method. The block parameter, `sheep`,
+  will represent each integer in the count, and for each iteration we print the current integer value assigned to sheep to the screen. We also have an if statement
+  that contains a `return` keyword.
+  
+  On line 10, when we invoke the count sheep method, we will output 0-2 from within the method, the method will return nil, and we then output the return value of the method.
+
+  As we iterate through the block we will be counting from 0 to 1 to 2. On the third iteration, the condition ```sheep >= 2``` will evaluate as true and ruby will
+    execute line 5. When we use `return` to explicitly return from a method, we return the value provided to that keyword `return`. In this code, there wasn’t any value provided.
+    So we can expect the return value of the method to be `nil`. The `nil` is output to the console when it is returned from the `count_sheep` method call
+    and passed to the `p` method.
+   
+
+  ----Transcribed from video walkthroughs.
+  On line 7 we are invoking the count_sheep method, and printing the return value of the method to the console.
+  We call `Integer#times` on 5, and ruby will iterate through the given block 5 times. The block parameter, `sheep`, will represent each integer in the count.
+  The last line of the method is actually the invocation of the `Integer#times` method because the `do..end` block is an argument.
+  "The evaluated result of the last line of the method"
+
+    Within the block passed to times we have an if statement.
+    When we invoke the count sheep method, we will output 0-2 from within the method, the method will return nil, and we then output the return value of the method.
+    As we iterate through the block we will be counting from 0 to 1 to 2. On the third iteration, the condition ```sheep >= 2``` will evaluate as true and ruby will
+    execute line 5. When we explicitly use the keyword return...
+  ----
+
+
+
+  On line 10, when `count_sheep` is called, ```0, 1, 2``` is output to the console. The return value of `count_sheep` is then passed to the
   `p` method call, which prints `nil` to the console.
 
-  The times method calls the given block once for each integer from 0 to the number it was called on, passing that integer as a parameter.
+  On line 2, the times method is passed the given `do..end` block once for each integer from 0 to the number it was called on, passing local variable `sheep` each time.
 
   On line 2, the times method is called on the integer 5, and passed the `do..end` block as an argument. A `times` loop is zero-based, 
   and therefore, on line 2, local variable `sheep` is initialized to integer 0 within the first iteration of the loop.
   On line 3, we are calling the puts method and pass it the current integer value assigned to sheep as an argument. On the first iteration,
-  this invocation will output `"0"` and return nil.
+  this invocation will output 0 and return nil.
 
-  On line 4, `sheep >= 2` is evaluated using the current integer value assigned to sheep. Within the first iteration, the expression `0 >= 2`
+  On line 4, ```sheep >= 2``` is evaluated using the current integer value assigned to sheep. Within the first iteration, the expression `0 >= 2`
   evaluates as `false` and the code does not enter into the `if` statement. The code then moves to the next iteration of the times loop,
-  reassigning local variable `sheep` to integer `1`. The code repeats the same process, outputting `1` to the console, not entering the `if`
+  reassigning local variable `sheep` to integer 1. The code repeats the same process, outputting `1` to the console, not entering the `if`
   statement, and moving to the next iteration where local variable `sheep` is reassigned to integer `2`.
 
   When local variable `sheep` points to integer `2`, On line 3, we are calling the puts method and passing integer `2` as an argument. This
@@ -63,14 +91,14 @@
 
 ###VARIABLE SCOPE###
 
-a = 7
-array = [1, 2, 3]
+# a = 7
+# array = [1, 2, 3]
 
-array.each do |element|
-  a = element
-end
+# array.each do |element|
+#   a = element
+# end
 
-puts a
+# puts a
 
 =begin
   The code will output `"3"` to the console and return `nil`.
