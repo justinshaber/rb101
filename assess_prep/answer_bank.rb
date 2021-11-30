@@ -3,16 +3,16 @@
 # What concept does it demonstrate?
 
 ###PUTS v RETURN###
-def count_sheep
-  5.times do |sheep|
-    puts sheep
-    if sheep >= 2
-      return
-    end
-  end
-end
+# def count_sheep
+#   5.times do |sheep|
+#     puts sheep
+#     if sheep >= 2
+#       return
+#     end
+#   end
+# end
 
-p count_sheep
+# p count_sheep
 
 =begin
   concepts - puts vs return, implicit return value (explicit return overrides implicit return)
@@ -186,6 +186,44 @@ p count_sheep
 
 
 ###MUTATING v NON_MUTATING###
+def plus(x, y)
+  x = x + y
+end
+
+a = 3
+b = plus(a, 2)
+
+puts a
+puts b
+
+=begin
+  Where do I begin?
+    - method definition
+    - variable initialization
+  
+  The local variable `a` is initialized to integer 3 on line 5. On line 6 we invoke the method `plus` and pass it ```(a, 2)``` as an argument. Also on line 6, Variable `b`
+  is initialized to point to the return value of the `plus` method call. On lines 1-3, we define the `plus` method. On line 1, local variable `x` is initialized to 
+  reference the same object as local variable `a`, integer 3. Within the method definition body, we reassign local variable `x` to a new integer object 5.
+  Because the method definition contains only one line, the method will return the evaluated result of ```x = x + y```, which is 5. On line 8, we invoke the puts 
+  method, passing local variable `a` as an argument, which outputs integer 3 and returns `nil`. On line 9, we invoke the puts method, passing local variable `b` 
+  as an argument, which outputs integer 5 and return `nil`  This demonstrates that reassignment does not change an object, but simply point the variable to a new object.
+
+  
+  On line 5, local variable `a` is initialized to integer 3.
+  On line 6, local variable `b` is initialized to the return value of invoking the `plus` method which is passed ```(a,2)``` as an argument.
+  On lines 1-3, we have a method definition for the method `plus`.
+  On line 1, local variable `x` is initialized to variable `a`, and therefore references the same integer object 3.
+  Also on line 1, local variable `y` is initialized to integer 2.
+  Within the method definition, local variable `x` is reassigned to point to a new integer object, the sum of x plus y. Because the method 
+  definition contains only one line, the method will return the evaluated result of ```x = x + y```, which is 5.
+  On line 6, local variable `b` is initialized to the return value of invoking the 'plus' method, which is a new integer object 5.
+  On line 8, the puts method is invoked with local variable `a` passed as an argument, resulting in 3 being displayed to the console and returning `nil`.
+  One line 9, the puts method is invoked with local variable `b` passed as an argument, resulting in 5 being displayed to the console and returning `nil`.
+
+  This demonstrates that reassignment does not change an object, but simply points the variable to a new object.
+  
+=end
+
   # a = [1, 2, 3]
   
   # def mutate(array)
