@@ -186,15 +186,15 @@
 
 
 ###MUTATING v NON_MUTATING###
-def plus(x, y)
-  x = x + y
-end
+# def plus(x, y)
+#   x = x + y
+# end
 
-a = 3
-b = plus(a, 2)
+# a = 3
+# b = plus(a, 2)
 
-puts a
-puts b
+# puts a
+# puts b
 
 =begin
   Where do I begin?
@@ -260,6 +260,52 @@ puts b
 
 
 ###COLLECTIONS###
+
+numbers = {
+  high:   100,
+  medium: 50,
+  low:    10
+}
+
+half_nums = numbers.map do |k, v|
+              v / 2
+            end
+
+p half_nums
+
+=begin
+  On line 1 local variable `numbers` is initialized to a hash that contains three key value pairs. On line 7, we invoke the `map` method
+  on the collection assigned to local variable `numbers` passing the `do..end` block with two parameters `k` and `v`. This `map` method invocation will evaluate the code
+  ```v / 2``` within the given block once for each element in the hash assigned to local variable `numbers`. Each value returned from the block is
+  added to a new array collection which is then assigned to local variable half_nums.
+
+  On line 11, the array [50, 25, 2] pointed to by local variable `half_nums` is passed to p method as an argument, which prints it to the screen.
+=end
+
+
+# [1, 2, 3].each do |num|
+#   puts num
+# end
+
+=begin
+  The `each` method invocation will call the given `do..end` block once for each element in the ```[1, 2, 3]``` array it was called on, passing 
+  each element as a parameter. In this case, the current element will be assigned to local variable `num`. Within the method, we invoke the puts method and 
+  pass local variable `num` as an argument. As a result, ```1, 2, 3``` will be output to the screen. The `each` method invocation returns the original collection
+  it was called on, and as a result, ```[1, 2, 3]``` will be returned.
+=end
+
+# a = "hello"
+
+# [1, 2, 3].map { |num| a }
+
+=begin
+  On line 1 we initialize local variable `a` to string "hello". On line 2, the map method invocation will call the given block ```{ |num| a }```
+  once for each element in the ```[1, 2, 3]``` array it was called on, and evaluate the return value of the passed block, in this case "hello".
+  `map` then uses this return value to build a new collection of transformed values. As such, this invocation of `map` will output nothing and
+  return a new array object ```["hello", "hello", "hello"]```.
+=end
+
+
   # { a: "ant", b: "bear", c: "cat" }.all? do |key, value|
   #   value.length >= 3
   # end
@@ -276,6 +322,24 @@ puts b
 =end
 
 ###TRUTHINESS###
+
+# number = rand(10)
+
+# if number = 5
+#   puts '5 is a cool number!'
+# else
+#   puts 'Other numbers are cool too!'
+# end
+
+=begin
+  ON line 1, local variable `number` is initialized to a random number between 0 - 9. On line 3, we provide ```number = 5``` as the conditional,
+    which returns the integer 5, and in Ruby, evaluates as true. This is because assignment will always return the assigned value, and Ruby 
+    will evaluate every expression as true except `false` or `nil`. As a result, line 4 will execute every time.
+
+  In order for the code to run properly, we want to compare local variable `number` to integer 5. To do this, we need to change the assignment
+    operator `=` within the conditional to comparison operator `==`, which returns `true` if the two compared entities have the same value,
+    and `false` if they do not.
+=end
 
 # number = 7
 
