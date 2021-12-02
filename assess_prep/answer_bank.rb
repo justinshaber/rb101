@@ -261,17 +261,25 @@
 
 ###COLLECTIONS###
 
-numbers = {
-  high:   100,
-  medium: 50,
-  low:    10
-}
+arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-half_nums = numbers.map do |k, v|
-              v / 2
-            end
+new_array = arr.map do |n| 
+  n > 1
+end
 
-p half_nums
+p new_array
+
+# numbers = {
+#   high:   100,
+#   medium: 50,
+#   low:    10
+# }
+
+# half_nums = numbers.map do |k, v|
+#               v / 2
+#             end
+
+# p half_nums
 
 =begin
   On line 1 local variable `numbers` is initialized to a hash that contains three key value pairs. On line 7, we invoke the `map` method
