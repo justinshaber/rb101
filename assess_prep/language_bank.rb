@@ -27,6 +27,7 @@ Always aim to answer:
   `a << "str"` - mutates the caller and modifies the existing [object] (str), which is also pointed to by variable 'b'
 ###COLLECTIONS###
   The block parameter is `|_|`, which represents each element as the `___` method iterates through the collection.
+  ?---An array is an object that can contain references to other objects. String do not.
 ###TRUTHINESS###
 ###METHOD DEFINITION v INVOKE###
   The method has a parameter `_` which allows the method to access the object `_` since it is passed in as 
