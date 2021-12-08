@@ -46,3 +46,44 @@ start with sort not with p
 good - how sort works with strings
 
 =end
+
+a = 1
+b = 2
+
+if a
+  puts "Hallo!"
+elsif b
+  puts "Goodbye!"
+else
+  puts "No greeting for you!"
+end
+
+# What does this code output? Why?
+
+def greeting(name)
+  "Hello, #{name}!" # returns a string (making use of string interpolation)
+end
+
+greeting('Bobby')
+
+# what is the item on lines 1-3? What about line 5? What are they called and how are they different?
+
+name = 'Susie'
+
+def greeting
+  puts "Hello #{name}!"
+end
+
+greeting
+puts greeting
+# what do the last two lines output? Why?
+
+def greeting(word)
+  word << '!!!'
+end
+
+name = 'Jim'
+greeting(name)
+p name
+# what is name? Explain why
+
