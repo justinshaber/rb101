@@ -25,9 +25,14 @@ Always aim to answer:
 
 ###MUTATING v NON_MUTATING###
   `a << "str"` - mutates the caller and modifies the existing [object] (str), which is also pointed to by variable 'b'
+            The `<<` method mutates the caller which will permanently alter the object referenced to by `a`. This change will
+            be seen by any variable referencing the same object.
 ###COLLECTIONS###
   The block parameter is `|_|`, which represents each element as the `___` method iterates through the collection.
   ?---An array is an object that can contain references to other objects. String do not.
+
+  any? looks at the truthiness of the block's return value in order to determine what the method's return value will be.
+    If the block returns a "truthy" value for any element in the collection, then the method will return true.
 ###TRUTHINESS###
 ###METHOD DEFINITION v INVOKE###
   The method has a parameter `_` which allows the method to access the object `_` since it is passed in as 

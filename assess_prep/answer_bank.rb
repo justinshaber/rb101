@@ -186,6 +186,18 @@
 
 
 ###MUTATING v NON_MUTATING###
+a = ["a", "b", "c"]
+a[1] = "-"
+p a
+
+=begin
+    On line 1, local variable `a` is initialized to an array object with three elements each referencing a string object.
+    On line 2, we use index assignment to assign a new string `"-"` to `a[1]`. While the second element now references a new
+    string object, the array has been permanently altered, or mutated. We mutated the array referenced by `a` by reassigning
+    the element at `a[1]` to a new string object.
+=end
+
+
 # def plus(x, y)
 #   x = x + y
 # end
@@ -261,13 +273,13 @@
 
 ###COLLECTIONS###
 
-arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-new_array = arr.map do |n| 
-  n > 1
-end
+# new_array = arr.map do |n| 
+#   n > 1
+# end
 
-p new_array
+# p new_array
 
 # numbers = {
 #   high:   100,
