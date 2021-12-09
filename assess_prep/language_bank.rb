@@ -33,6 +33,20 @@ Always aim to answer:
 
   any? looks at the truthiness of the block's return value in order to determine what the method's return value will be.
     If the block returns a "truthy" value for any element in the collection, then the method will return true.
+
+  The `each` method will iterate through each element in the calling array, assigning the block parameter `_` to the value
+  of each element in turn and executing the block.
+  The each method will return the original collection it was called on. In this case `[1, 2, 3]`.
+
+  The `select` method will iterate through each element in the calling array, assigning the block parameter `_` to the value
+  of each element in turn and executing the block.
+  The select method will return a new array populated with values from the original array for which the block returned a `truthy`
+  value.
+
+  The `map` method will iterate through each element in the calling array, assigning the block parameter `_` to the value
+  of each element in turn and executing the block.
+  The 'map' method returns a new collection containing the block return values of each iteration.
+
 ###TRUTHINESS###
 ###METHOD DEFINITION v INVOKE###
   The method has a parameter `_` which allows the method to access the object `_` since it is passed in as 
