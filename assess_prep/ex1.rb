@@ -1,4 +1,13 @@
 
+if false
+  greeting = "hello world"
+end
+
+p greeting
+
+# In this code, line 7 will throw an error. This is becuase local variable `greeting` was never initialized.
+# The code on line 4, will never be run because the conditional in the `if` statement is boolean `false`.
+
 def fix(value)
   puts "initial object #{value.object_id}"
   value = value.upcase

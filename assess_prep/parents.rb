@@ -28,22 +28,34 @@
 # p find_children("xXfuUuuF") == "FfUuuuXx"
 # p find_children("") == ""
 
-def doubled_numbers!(array)
-  counter = 0
+# def doubled_numbers!(array)
+#   counter = 0
 
-  loop do
-    current = array[counter]
-    array[counter] = current * 2
-    
-    break if counter == array.size - 1
-    counter += 1
+#   loop do
+#     current = array[counter]
+#     array[counter] = current * 2
+
+#     break if counter == array.size - 1
+#     counter += 1
+#   end
+
+#   array
+# end
+
+# numbers = [10, 20, 30, 40, 50]
+
+# p numbers
+# doubled_numbers!(numbers)
+# p numbers
+
+def method()
+  if false
+    1
+  else
+    number = 2
   end
 
-  array
+  number
 end
 
-numbers = [10, 20, 30, 40, 50]
-
-p numbers
-doubled_numbers!(numbers)
-p numbers
+puts method

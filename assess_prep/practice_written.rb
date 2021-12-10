@@ -1,4 +1,28 @@
 ############################
+
+a = [2]
+puts a.object_id
+b = [1, 3]
+c = [a, b]
+c[0][0] = 5
+p c # =>  what will this print and why?
+p a # =>  what object is a referencing? 
+puts a.object_id # => Will this match the first object_id that is printed?
+
+############################
+
+# What will the pairs hash be after we run this code?
+
+pairs = { "a" => 1, "b" => 2, "c" => 3 }
+
+incremented_values = pairs.map do |k, v| 
+  pairs[k] = v + 1 
+end
+
+p incremented_values # [2, 3, 4]
+p pairs
+
+############################
 # What is the return value of reject in the following code? Why?
 
 [1, 2, 3].reject do |num|
@@ -23,6 +47,7 @@ end
 end
 
 ############################
+# What is the return value of partition in the following code? Why?
 
 [1, 2, 3].partition do |num|
   num.odd?
@@ -79,7 +104,7 @@ greetings = { a: 'hi' }
 informal_greeting = greetings[:a]
 informal_greeting << ' there'
 
-puts informal_greeting  #  => "hi there"
+puts informal_greeting
 puts greetings
 
 ############################

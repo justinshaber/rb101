@@ -186,6 +186,26 @@
 
 
 ###MUTATING v NON_MUTATING###
+# What does the last line in the code below output? Why?
+
+greetings = { a: 'hi' }
+informal_greeting = greetings[:a]
+informal_greeting << ' there'
+
+puts informal_greeting
+puts greetings
+
+# The last line of the code outputs the hash `{ a: 'hi there' }`.
+
+# On line 4, local variable `informal greeting` is initialzied to the return value of the value at key `[:a]` in the hash 
+# referenced by local variable `greetings`, which is `hi`. Now, both `informal_greeting` and the value at key `[:a]` in the 
+# `greetings` hash point to the same string object `"hi"`, so any destructive changes made to this object will be reflected in
+# any local variable referencing it. Therefore, when we invoke the mutating `<<` method on the string `'hi'` referenced by local
+# variable `informal_greeting`, appending ` "there"` to it, the change is reflected in both local variables.
+
+############################
+
+
 a = ["a", "b", "c"]
 a[1] = "-"
 p a
