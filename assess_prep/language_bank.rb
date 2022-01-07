@@ -45,7 +45,7 @@ Always aim to answer:
 
   The `map` method will iterate through each element in the calling array, assigning the block parameter `_` to the value
   of each element in turn and executing the block.
-  The 'map' method returns a new collection containing the block return values of each iteration.
+  The 'map' method returns a new collection containing the return values of the blocks for each iteration.
 
 ###TRUTHINESS###
 ###METHOD DEFINITION v INVOKE###
