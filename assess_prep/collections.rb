@@ -31,12 +31,3 @@
 # [3, 4] # first element is removed
 # #-----
 # [3, 4] # No third iteration, because no third element.
-
-p ['arc', 'bat', 'cape', 'ants', 'cap'].sort
-
-sorted = ['cot', 'bed', 'mat'].sort_by do |word|
-  puts word[1]
-  word[1]
-end
-
-p sorted
