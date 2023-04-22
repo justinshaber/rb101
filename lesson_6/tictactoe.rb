@@ -118,18 +118,18 @@ def get_third_square(brd, marker)
 end
 
 def computer_plays!(brd)
-  square = get_third_square(brd, COMPUTER_MARKER)
+  square = get_third_square(brd, COMPUTER_MARKER) # win if able
 
   if !square
-    square = get_third_square(brd, PLAYER_MARKER)
+    square = get_third_square(brd, PLAYER_MARKER) # prevent opponent win if able
   end
 
   if !square
-    square = 5 if empty_squares(brd).include?(5)
+    square = 5 if empty_squares(brd).include?(5) # take square 5
   end
 
-  if !square
-    square = empty_squares(brd).sample
+  if !square 
+    square = empty_squares(brd).sample # choose random square
   end
 
   brd[square] = COMPUTER_MARKER
